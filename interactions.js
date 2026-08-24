@@ -24,12 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const moonPivot = document.querySelector("#moon-pivot");
     const moonSpin = document.querySelector("#moon-spin");
     const moonModel = document.querySelector("#moon-model");
-    const moonPath = document.querySelector("#moon-path");
 
     // UI Elements
     const topControls = document.querySelector("#top-controls");
     const planetSelector = document.querySelector("#planet-selector");
-    const focusTopUi = document.querySelector("#focus-top-ui"); // The new top buttons
+    const focusTopUi = document.querySelector("#focus-top-ui"); 
     const focusPanel = document.querySelector("#focus-panel");
     const focusTitle = document.querySelector("#focus-title");
     const focusDesc = document.querySelector("#focus-desc");
@@ -61,48 +60,40 @@ document.addEventListener("DOMContentLoaded", () => {
         spaceBg.setAttribute("visible", bgVisible);
     });
 
-    // === RICH PLANET DATA (Scrollable) ===
+    // === RICH PLANET DATA ===
     const planetData = {
         sun: {
             title: "☀️ The Sun",
             desc: `<b>Type:</b> Yellow Dwarf Star (G2V)<br>
                    <b>Age:</b> 4.6 Billion Years<br>
                    <b>Temperature:</b> 5,500°C (Surface)<br><br>
-                   The Sun lies at the heart of the solar system, where it is by far the largest object. It holds 99.8% of the solar system's mass and is roughly 109 times the diameter of the Earth.<br><br>
+                   The Sun lies at the heart of the solar system. It holds 99.8% of the solar system's mass and is roughly 109 times the diameter of the Earth.<br><br>
                    <i>Gesture Control: Swipe screen to manually rotate the Sun, pinch to zoom in and out.</i>`,
-            target: sunWrapper,
             model: sunModel,
             baseScale: 1,
-            focusScale: 1.5,
-            defaultPos: "0 0 0"
+            focusScale: 1.5
         },
         earth: {
             title: "🌍 Earth",
             desc: `<b>Type:</b> Terrestrial Planet<br>
                    <b>Distance from Sun:</b> ~150 Million km<br>
                    <b>Radius:</b> 6,371 km<br><br>
-                   Our home planet is the third planet from the Sun, and the only place we know of so far that's inhabited by living things. It has a solid and active surface with mountains, valleys, canyons, and plains.<br><br>
-                   Earth's atmosphere consists of 78% nitrogen, 21% oxygen, and 1% other ingredients—the perfect balance to breathe and live.<br><br>
+                   Our home planet is the third planet from the Sun, and the only place we know of so far that's inhabited by living things.<br><br>
                    <i>Gesture Control: Swipe screen to manually rotate Earth, pinch to zoom.</i>`,
-            target: earthContainer,
             model: earthModel,
             baseScale: 0.4,
-            focusScale: 1.2,
-            defaultPos: "2 0 0"
+            focusScale: 1.2
         },
         moon: {
             title: "🌙 The Moon",
             desc: `<b>Type:</b> Natural Satellite<br>
                    <b>Distance from Earth:</b> 384,400 km<br>
                    <b>Orbital Period:</b> 27.3 Days<br><br>
-                   The Moon is Earth's only natural satellite. It is the fifth largest satellite in the Solar System and the largest and most massive relative to its parent planet.<br><br>
-                   Its surface is actually very dark, although compared to the night sky it appears very bright.<br><br>
+                   The Moon is Earth's only natural satellite. It is the fifth largest satellite in the Solar System.<br><br>
                    <i>Gesture Control: Swipe screen to rotate the Moon, pinch to zoom.</i>`,
-            target: moonModel,
             model: moonModel,
             baseScale: 0.15,
-            focusScale: 0.8,
-            defaultPos: "0.6 0 0"
+            focusScale: 0.8
         }
     };
 
@@ -111,35 +102,47 @@ document.addEventListener("DOMContentLoaded", () => {
         focusedObject = planetKey;
         const data = planetData[planetKey];
 
-        // 1. Manage UI (Swap menus)
+        // 1. Manage UI
         topControls.classList.add("hidden");
         planetSelector.classList.add("hidden");
-        focusTopUi.classList.remove("hidden"); // Show Back and Pause buttons
+        focusTopUi.classList.remove("hidden"); 
         focusPanel.classList.remove("hidden");
         
         focusTitle.innerHTML = data.title;
         focusDesc.innerHTML = data.desc;
 
-        // 2. Hide everything in the system
+        // 2. Hide individual models (Do NOT hide the containers, otherwise children disappear)
         sunWrapper.setAttribute("visible", false);
-        earthContainer.setAttribute("visible", false);
+        earthModel.setAttribute("visible", false);
         moonModel.setAttribute("visible", false);
         spaceBg.setAttribute("visible", false);
         orbitPaths.forEach(el => el.setAttribute("visible", false));
 
         // 3. Pause all orbits
         animTargets.forEach(el => el.emit('pauseOrbit'));
+        
+        // 4. Center all underlying math so the camera angle is perfect
         earthPivot.setAttribute("rotation", "0 0 0"); 
         moonPivot.setAttribute("rotation", "0 0 0"); 
+        earthContainer.setAttribute("position", "0 0 0"); // Centers the hierarchy!
 
-        // 4. Unhide ONLY the selected target, push to top of screen, scale up
-        data.target.setAttribute("visible", true);
-        data.target.setAttribute("position", "0 1.5 -2.5"); 
+        // 5. Reveal and move the specific target to the top of the screen
+        data.model.setAttribute("visible", true); 
         
+        if (planetKey === 'sun') {
+            sunWrapper.setAttribute("visible", true);
+            sunWrapper.setAttribute("position", "0 1.5 -2.5");
+        } else if (planetKey === 'earth') {
+            earthContainer.setAttribute("position", "0 1.5 -2.5");
+        } else if (planetKey === 'moon') {
+            moonModel.setAttribute("position", "0 1.5 -2.5");
+        }
+        
+        // 6. Scale it up
         currentFocusScale = data.focusScale;
         data.model.setAttribute("scale", `${currentFocusScale} ${currentFocusScale} ${currentFocusScale}`);
         
-        // 5. Manage Spin State
+        // 7. Manage Spin State
         isSpinning = true;
         document.querySelector("#btn-focus-spin").innerText = "⏸ Pause Spin";
         if (planetKey === 'earth') earthSpin.emit('resumeSpin');
@@ -147,12 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (planetKey === 'sun') sunWrapper.emit('resumeOrbit');
     }
 
-    // Connect the bottom dock buttons
     document.querySelector("#btn-focus-sun").addEventListener("click", () => enterFocusMode('sun'));
     document.querySelector("#btn-focus-earth").addEventListener("click", () => enterFocusMode('earth'));
     document.querySelector("#btn-focus-moon").addEventListener("click", () => enterFocusMode('moon'));
 
-    // === EXIT EXPLORE MODE (The Small Top Left Button) ===
+    // === EXIT EXPLORE MODE ===
     document.querySelector("#btn-exit-focus").addEventListener("click", () => {
         const data = planetData[focusedObject];
         focusedObject = null;
@@ -165,14 +167,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Restore visibility to everything
         sunWrapper.setAttribute("visible", true);
-        earthContainer.setAttribute("visible", true);
+        earthModel.setAttribute("visible", true);
         moonModel.setAttribute("visible", true);
         if (bgVisible) spaceBg.setAttribute("visible", true);
         if (pathsVisible) orbitPaths.forEach(el => el.setAttribute("visible", true));
 
-        // Put the explored object back where it belongs
-        data.target.setAttribute("position", data.defaultPos);
-        data.model.setAttribute("scale", `${data.baseScale} ${data.baseScale} ${data.baseScale}`);
+        // Reset positions entirely
+        sunWrapper.setAttribute("position", "0 0 0");
+        earthContainer.setAttribute("position", "2 0 0");
+        moonModel.setAttribute("position", "0.6 0 0");
+
+        // Reset scales entirely
+        sunModel.setAttribute("scale", "1 1 1");
+        earthModel.setAttribute("scale", "0.4 0.4 0.4");
+        moonModel.setAttribute("scale", "0.15 0.15 0.15");
+
+        // Reset manual touch rotations
         data.model.setAttribute("rotation", "0 0 0");
 
         // Resume orbits if system is playing
@@ -186,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // === TOGGLE SPIN BUTTON (The Small Top Right Button) ===
+    // === TOGGLE SPIN BUTTON ===
     document.querySelector("#btn-focus-spin").addEventListener("click", (e) => {
         isSpinning = !isSpinning;
         e.target.innerText = isSpinning ? "⏸ Pause Spin" : "▶ Resume Spin";
