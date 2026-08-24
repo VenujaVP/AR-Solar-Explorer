@@ -20,27 +20,23 @@
          ================================================================ -->
     <div id="ar-ui-container" class="hidden">
       
-      <!-- Top Control Bar (Visible in Solar System view) -->
       <div id="top-controls">
         <button id="btn-play-pause" class="glass-btn">⏸ Pause Orbits</button>
         <button id="btn-toggle-orbits" class="glass-btn">⭕ Show Paths</button>
         <button id="btn-toggle-bg" class="glass-btn">🌌 Background: OFF</button>
       </div>
 
-      <!-- Professional Planet Selector Dock -->
       <div id="planet-selector">
         <button id="btn-focus-sun" class="dock-btn">☀️ Sun</button>
         <button id="btn-focus-earth" class="dock-btn">🌍 Earth</button>
         <button id="btn-focus-moon" class="dock-btn">🌙 Moon</button>
       </div>
 
-      <!-- NEW: Explore Mode Top Buttons (Back & Pause) -->
       <div id="focus-top-ui" class="hidden">
         <button id="btn-exit-focus" class="action-btn top-left">❮ Back</button>
         <button id="btn-focus-spin" class="action-btn top-right">⏸ Pause Spin</button>
       </div>
 
-      <!-- Planet Focus Panel (Bottom 40%, Scrollable Details) -->
       <div id="focus-panel" class="hidden">
         <h2 id="focus-title">Planet</h2>
         <div class="scroll-area">
@@ -68,7 +64,6 @@
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
       <a-light type="ambient" color="#cccccc" intensity="1"></a-light>
       <a-light type="point" position="0 0 0" color="#ffffff" intensity="2"></a-light>
 
@@ -77,37 +72,44 @@
         <a-image id="space-bg" src="#spaceTexture" position="0 0 -3" width="8" height="8" visible="false"></a-image>
 
         <a-entity id="solar-system-root" rotation="90 0 0" scale="0.2 0.2 0.2">
-
-          <!-- SUN -->
+          
           <a-entity id="sun-wrapper" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-            <a-gltf-model id="sun-model" src="#sunModel"></a-gltf-model>
+            <a-gltf-model id="sun-main" src="#sunModel"></a-gltf-model>
           </a-entity>
 
-          <!-- EARTH ORBIT PATH -->
           <a-torus id="earth-path" class="orbit-path" radius="2" radius-tubular="0.015" color="#ffffff" opacity="0.6" rotation="0 0 0" visible="false"></a-torus>
 
-          <!-- EARTH PIVOT -->
           <a-entity id="earth-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
             <a-entity id="earth-container" position="2 0 0">
-              <!-- EARTH MODEL -->
               <a-entity id="earth-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
-                <a-gltf-model id="earth-model" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
+                <a-gltf-model id="earth-main" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
               </a-entity>
 
-              <!-- MOON ORBIT PATH -->
               <a-torus id="moon-path" class="orbit-path" radius="0.6" radius-tubular="0.01" color="#ffffff" opacity="0.6" rotation="0 0 0" visible="false"></a-torus>
 
-              <!-- MOON PIVOT -->
               <a-entity id="moon-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-                <!-- MOON MODEL -->
                 <a-entity id="moon-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
-                  <a-gltf-model id="moon-model" src="#moonModel" position="0.6 0 0" scale="0.15 0.15 0.15"></a-gltf-model>
+                  <a-gltf-model id="moon-main" src="#moonModel" position="0.6 0 0" scale="0.15 0.15 0.15"></a-gltf-model>
                 </a-entity>
               </a-entity>
             </a-entity>
           </a-entity> 
-          
         </a-entity>
+
+        <!-- ================================================================
+             2. INDEPENDENT FOCUS MODE VIEWER
+             ================================================================ -->
+        <!-- Lowered slightly (Y=0.2) to give the models more headroom on the screen -->
+        <a-entity id="focus-root" position="0 0.2 0" visible="false">
+            <a-entity id="focus-spin-wrapper" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseFocusSpin; resumeEvents: resumeFocusSpin">
+                
+                <a-gltf-model id="focus-model-sun" src="#sunModel" visible="false"></a-gltf-model>
+                <a-gltf-model id="focus-model-earth" src="#earthModel" visible="false"></a-gltf-model>
+                <a-gltf-model id="focus-model-moon" src="#moonModel" visible="false"></a-gltf-model>
+
+            </a-entity>
+        </a-entity>
+
       </a-entity>
     </a-scene>
   </body>
