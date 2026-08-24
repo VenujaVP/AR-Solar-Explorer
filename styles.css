@@ -119,57 +119,30 @@ body {
     z-index: 999;
 }
 
-#top-controls {
-    pointer-events: auto; 
-    padding: 15px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-    background: rgba(11, 13, 23, 0.7);
-    backdrop-filter: blur(5px);
-}
-
-.ar-btn {
-    background: #3182ce;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* Perfect Bottom-Half Panel for Focus Mode */
-/* Ensure the Focus Panel rigidly occupies the bottom 50% */
-#focus-panel {
+/* Glassmorphism Buttons */
+.glass-btn {
     pointer-events: auto;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50vh; 
-    background: rgba(11, 13, 23, 0.95);
-    border-top: 2px solid #4facfe;
-    border-radius: 20px 20px 0 0;
+    background: rgba(20, 25, 40, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+.glass-btn:active { background: rgba(255, 255, 255, 0.2); }
+
+#top-controls {
     display: flex;
-    flex-direction: column;
+    gap: 8px;
     justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
-    z-index: 1000;
+    padding: 15px;
 }
 
-#focus-panel h2 { color: #00f2fe; margin-bottom: 10px; font-size: 2.2rem; }
-#focus-panel p { color: #e2e8f0; margin-bottom: 20px; font-size: 1.1rem; line-height: 1.5; flex-grow: 1; }
-.focus-controls { margin-bottom: 15px; width: 100%; }
-
-.danger-btn { background: #e53e3e; width: 90%; padding: 15px; font-size: 1.2rem; }
-.hidden { display: none !important; }
-
-/* NEW: Planet Selector Bar */
+/* Professional Planet Selector Dock */
 #planet-selector {
     pointer-events: auto;
     position: absolute;
@@ -177,16 +150,81 @@ body {
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 15px;
-    background: rgba(11, 13, 23, 0.85);
-    padding: 15px 25px;
-    border-radius: 50px;
-    border: 1px solid #4facfe;
-    backdrop-filter: blur(5px);
-    z-index: 900;
+    gap: 10px;
+    background: rgba(10, 15, 30, 0.7);
+    padding: 10px 15px;
+    border-radius: 30px;
+    border: 1px solid rgba(79, 172, 254, 0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
-#planet-selector .ar-btn {
-    font-size: 1.1rem;
-    padding: 10px 20px;
+.dock-btn {
+    background: transparent;
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
 }
+.dock-btn:active { background: rgba(79, 172, 254, 0.3); border-color: #4facfe; }
+
+/* Focus Mode Top Buttons (Small Back & Pause) */
+#focus-top-ui {
+    pointer-events: auto;
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.action-btn {
+    background: rgba(10, 15, 30, 0.8);
+    border: 1px solid rgba(79, 172, 254, 0.6);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-weight: bold;
+    backdrop-filter: blur(5px);
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+/* Scrollable Focus Panel */
+#focus-panel {
+    pointer-events: auto;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40vh; /* Leaves top 60% of screen for the 3D model */
+    background: linear-gradient(180deg, rgba(15, 20, 35, 0.9) 0%, rgba(5, 8, 15, 1) 100%);
+    border-top: 1px solid #4facfe;
+    border-radius: 25px 25px 0 0;
+    display: flex;
+    flex-direction: column;
+    padding: 25px 20px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.7);
+}
+
+#focus-title { color: #00f2fe; margin-bottom: 10px; font-size: 1.8rem; text-align: center; }
+
+.scroll-area {
+    overflow-y: auto; /* Allows smooth vertical scrolling */
+    flex-grow: 1;
+    padding-right: 5px;
+}
+
+#focus-desc { 
+    color: #cbd5e0; 
+    font-size: 1rem; 
+    line-height: 1.6; 
+    text-align: left;
+}
+
+.hidden { display: none !important; }
