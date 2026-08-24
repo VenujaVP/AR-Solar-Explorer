@@ -104,3 +104,79 @@ body {
     font-size: 0.8rem;
     color: #4a5568;
 }
+
+/* ========================================================
+   AR INTERFACE OVERLAYS
+   ======================================================== */
+#ar-ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Lets you tap the 3D canvas behind the UI */
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#top-controls, #system-controls, #focus-panel {
+    pointer-events: auto; /* Makes buttons clickable again */
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: rgba(11, 13, 23, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.ar-btn {
+    background: #3182ce;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.icon-btn {
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    width: 45px;
+    height: 45px;
+}
+
+#system-controls span {
+    color: white;
+    align-self: center;
+    font-weight: bold;
+}
+
+#focus-panel {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    border: 1px solid #4facfe;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#focus-panel h2 { color: #00f2fe; margin-bottom: 5px; }
+#focus-panel p { color: #e2e8f0; margin-bottom: 15px; font-size: 0.9rem; }
+.focus-controls { margin-bottom: 15px; }
+
+.danger-btn { background: #e53e3e; }
+.hidden { display: none !important; }

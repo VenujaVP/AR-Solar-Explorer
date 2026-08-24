@@ -3,21 +3,55 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Marker AR - Solar System</title>
+    <title>Marker AR - Interactive Solar System</title>
+    
+    <link rel="stylesheet" href="styles.css">
 
-    <!-- A-Frame: the 3D engine -->
     <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
-
-    <!-- MindAR: the image tracking -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-    <!-- Kill the default page margin so the camera fills the screen -->
+    <!-- Import our custom interactions script -->
+    <script src="interactions.js" defer></script>
+    
     <style> body { margin: 0; overflow: hidden; } </style>
   </head>
 
   <body>
     <!-- ================================================================
-         THE SCENE
+         THE AR UI OVERLAY
+         ================================================================ -->
+    <div id="ar-ui-container">
+      
+      <!-- Top Control Bar -->
+      <div id="top-controls">
+        <button id="btn-play-pause" class="ar-btn">⏸ Pause Orbits</button>
+        <button id="btn-toggle-orbits" class="ar-btn">⭕ Show Paths</button>
+        <button id="btn-toggle-bg" class="ar-btn">🌌 Background: OFF</button>
+      </div>
+
+      <!-- Bottom Control Bar (System Move/Scale/Rotate) -->
+      <div id="system-controls">
+        <span>Adjust System:</span>
+        <button id="btn-scale-down" class="icon-btn">➖</button>
+        <button id="btn-scale-up" class="icon-btn">➕</button>
+        <button id="btn-rotate-left" class="icon-btn">↺</button>
+        <button id="btn-rotate-right" class="icon-btn">↻</button>
+      </div>
+
+      <!-- Planet Focus Panel (Hidden by default) -->
+      <div id="focus-panel" class="hidden">
+        <h2>🌍 Earth</h2>
+        <p>Third planet from the Sun. The only known world to harbor life.</p>
+        <div class="focus-controls">
+          <button id="btn-focus-zoom-in" class="icon-btn">🔍+</button>
+          <button id="btn-focus-zoom-out" class="icon-btn">🔍-</button>
+        </div>
+        <button id="btn-exit-focus" class="ar-btn danger-btn">← Back to Solar System</button>
+      </div>
+
+    </div>
+
+    <!-- ================================================================
+         THE 3D SCENE
          ================================================================ -->
     <a-scene
       mindar-image="imageTargetSrc: ./markers/targets.mind; autoStart: true;"
@@ -26,68 +60,57 @@
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
     >
-
-      <!-- 1. LOAD THE 3D MODELS -->
       <a-assets>
         <a-asset-item id="sunModel" src="./models/sun.glb"></a-asset-item>
         <a-asset-item id="earthModel" src="./models/earth.glb"></a-asset-item>
         <a-asset-item id="moonModel" src="./models/moon.glb"></a-asset-item>
+        <img id="spaceTexture" src="./markers/space.jpg">
       </a-assets>
 
-      <!-- 2. THE AR CAMERA -->
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <!-- Raycaster added to camera to detect screen taps on 3D models -->
+      <a-camera position="0 0 0" look-controls="enabled: false" cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-camera>
 
-      <!-- 3. LIGHTING -->
       <a-light type="ambient" color="#cccccc" intensity="1"></a-light>
       <a-light type="point" position="0 0 0" color="#ffffff" intensity="2"></a-light>
 
-      <!-- ==============================================================
-           THE AR TRACKING TARGET
-           ============================================================== -->
+      <!-- The Space Background (Hidden by default) -->
+      <a-sky id="space-bg" src="#spaceTexture" visible="false"></a-sky>
+
       <a-entity mindar-image-target="targetIndex: 0">
+        <!-- ROOT: We apply scale and manual rotations here -->
+        <a-entity id="solar-system-root" rotation="90 0 0" scale="0.2 0.2 0.2">
 
-        <!-- SOLAR SYSTEM ROOT 
-             Rotated 90 degrees so the planets orbit flat on the physical marker, 
-             and scaled down to fit on the screen -->
-        <a-entity rotation="90 0 0" scale="0.2 0.2 0.2">
-
-          <!-- ================= THE SUN ================= -->
-          <!-- The Sun rotates on its own axis every 10 seconds -->
-          <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
-            <a-gltf-model src="#sunModel" position="0 0 0" scale="1 1 1"></a-gltf-model>
+          <!-- SUN -->
+          <a-entity id="sun-wrapper" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+            <a-gltf-model src="#sunModel"></a-gltf-model>
           </a-entity>
 
-          <!-- ================= THE EARTH ================= -->
-          <!-- EARTH ORBIT: This invisible pivot rotates around the Sun every 15 seconds -->
-          <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear">
-            
-            <!-- THE EARTH MODEL: Pushed out 2 units on the X-axis from the center. 
-                 It rotates on its own axis every 5 seconds. -->
-            <a-entity position="2 0 0">
-              <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-                <a-gltf-model src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
-              </a-entity>
-            </a-entity>
+          <!-- EARTH ORBIT PATH -->
+          <a-ring id="earth-path" class="orbit-path" radius-inner="1.98" radius-outer="2.02" color="#ffffff" opacity="0.4" visible="false"></a-ring>
 
-            <!-- ================= THE MOON ================= -->
-            <!-- MOON ORBIT: Centered precisely on Earth's position (2 0 0).
-                 It rotates around the Earth every 4 seconds. -->
-            <a-entity position="2 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
+          <!-- EARTH PIVOT (Revolves around Sun) -->
+          <a-entity id="earth-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+            
+            <a-entity id="earth-container" position="2 0 0">
               
-              <!-- THE MOON MODEL: Pushed out 0.6 units from the Earth -->
-              <a-entity position="0.6 0 0">
-                <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
-                  <a-gltf-model src="#moonModel" scale="0.15 0.15 0.15"></a-gltf-model>
-                </a-entity>
+              <!-- EARTH MODEL (Clickable) -->
+              <a-entity id="earth-spin" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+                <a-gltf-model id="earth-model" class="clickable" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
+              </a-entity>
+
+              <!-- MOON ORBIT PATH -->
+              <a-ring id="moon-path" class="orbit-path" radius-inner="0.58" radius-outer="0.62" color="#ffffff" opacity="0.4" visible="false"></a-ring>
+
+              <!-- MOON PIVOT -->
+              <a-entity id="moon-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+                <a-gltf-model id="moon-model" src="#moonModel" position="0.6 0 0" scale="0.15 0.15 0.15"></a-gltf-model>
               </a-entity>
 
             </a-entity>
-            
-          </a-entity> <!-- End Earth Orbit -->
-
-        </a-entity> <!-- End Solar System Root -->
-      </a-entity> <!-- End MindAR Target -->
-
+          </a-entity> <!-- End Earth Pivot -->
+          
+        </a-entity>
+      </a-entity>
     </a-scene>
   </body>
 </html>
