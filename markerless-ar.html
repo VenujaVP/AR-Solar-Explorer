@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Markerless AR - Realistic Solar System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    /* Cleaned up CSS for AR overlay */
+    body { margin: 0; overflow: hidden; background: transparent; font-family: Arial, sans-serif; }
+    
+    #ui {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      padding: 15px 20px;
+      border-radius: 15px;
+      color: #fff;
+      text-align: center;
+      width: 260px;
+      z-index: 1000;
+    }
+    
+    #speed { width: 100%; margin-top: 10px; }
+    
+    #logoText {
+      position: fixed; top: 20px; left: 20px;
+      font-size: 18px; color: #fff; font-weight: bold;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+      z-index: 1000;
+    }
+
+    /* AR Status Message */
+    #ar-status {
+      position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+      background: rgba(49, 130, 206, 0.9); color: white;
+      padding: 10px 20px; border-radius: 20px; font-weight: bold;
+      z-index: 1000; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="logoText">AR Solar System</div>
+  <div id="ar-status">Start AR to detect a surface...</div>
+  
+  <div id="ui">
+    <label>Orbit Speed</label>
+    <input type="range" id="speed" min="0" max="5" step="0.1" value="1">
+  </div>
+
+  <!-- We use ES Modules to load Three.js and the native WebXR ARButton -->
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.147.0/build/three.module.js';
+    import { ARButton } from 'https://unpkg.com/three@0.147.0/examples/jsm/webxr/ARButton.js';
+
+    // 1. SCENE & CAMERA SETUP
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+    scene.add(new THREE.AmbientLight(0x404040, 2));
+
+    // 2. RENDERER (Must have alpha:true for transparent AR camera feed)
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.xr.enabled = true; // Turn on WebXR Device API
+    document.body.appendChild(renderer.domElement);
+
+    // 3. ADD AR BUTTON TO HTML
+    document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
+
+    // 4. THE SOLAR SYSTEM CONTAINER
+    // We put all planets in this group so we can move the whole system at once
+    const solarSystem = new THREE.Group();
+    solarSystem.visible = false; // Hide until user taps a surface
+    scene.add(solarSystem);
+
+    // ==========================================
+    // IMPORTED SCRIPT LOGIC (SCALED FOR AR)
+    // ==========================================
+    const SCALE = 0.015; // Shrinks the 80m wide system down to roughly 1.2 meters
+
+    // Sun
+    const sunTexture = new THREE.TextureLoader().load("textures/sun.jpg");
+    const sun = new THREE.Mesh(
+      new THREE.SphereGeometry(8 * SCALE, 32, 32),
+      new THREE.MeshBasicMaterial({ map: sunTexture }) 
+    );
+    solarSystem.add(sun);
+    
+    const sunLight = new THREE.PointLight(0xffffff, 2, 5); // Light range scaled down
+    sunLight.castShadow = true;
+    sun.add(sunLight);
+
+    // Planet Creator Function (Modified with SCALE)
+    function planet(name, size, distance, speed, texturePath, cloudPath, moonTexture, ringTexture) {
+      const texture = new THREE.TextureLoader().load(texturePath);
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(size * SCALE, 32, 32),
+        new THREE.MeshStandardMaterial({ map: texture })
+      );
+      mesh.castShadow = true;
+      const pivot = new THREE.Object3D();
+      mesh.position.x = distance * SCALE;
+      pivot.add(mesh);
+      solarSystem.add(pivot);
+
+      // Clouds
+      if (cloudPath) {
+        const cloudTex = new THREE.TextureLoader().load(cloudPath);
+        const cloudMesh = new THREE.Mesh(
+          new THREE.SphereGeometry((size + 0.05) * SCALE, 32, 32),
+          new THREE.MeshStandardMaterial({ map: cloudTex, transparent: true, opacity: 0.6 })
+        );
+        mesh.add(cloudMesh);
+      }
+      
+      // Moon
+      if (moonTexture) {
+        const moonTex = new THREE.TextureLoader().load(moonTexture);
+        const moonMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(0.8 * SCALE, 16, 16),
+          new THREE.MeshStandardMaterial({ map: moonTex })
+        );
+        const moonPivot = new THREE.Object3D();
+        moonMesh.position.x = (size + 2) * SCALE;
+        moonPivot.add(moonMesh);
+        mesh.add(moonPivot);
+      }
+      
+      // Ring
+      if (ringTexture) {
+        const ringTex = new THREE.TextureLoader().load(ringTexture);
+        const ring = new THREE.Mesh(
+          new THREE.RingGeometry((size + 1) * SCALE, (size + 3) * SCALE, 32),
+          new THREE.MeshBasicMaterial({ map: ringTex, side: THREE.DoubleSide, transparent: true })
+        );
+        ring.rotation.x = Math.PI / 2;
+        mesh.add(ring);
+      }
+      return { mesh, pivot, speed };
+    }
+
+    // Initialize Planets
+    const planets = [
+      planet("Mercury", 1.5, 12, 0.01, "textures/mercury.jpg"),
+      planet("Venus", 2, 18, 0.007, "textures/venus.jpg"),
+      planet("Earth", 2.5, 24, 0.005, "textures/earth.jpg", "textures/earth_clouds.jpg", "textures/moon.jpg"),
+      planet("Mars", 2, 30, 0.004, "textures/mars.jpg"),
+      planet("Jupiter", 4, 38, 0.003, "textures/jupiter.jpg"),
+      planet("Saturn", 3.5, 46, 0.002, "textures/saturn.jpg", null, null, "textures/saturn_ring.png"),
+      planet("Uranus", 3, 52, 0.0015, "textures/uranus.jpg"),
+      planet("Neptune", 3, 60, 0.001, "textures/neptune.jpg")
+    ];
+
+    // ==========================================
+    // WEBXR HIT TESTING & PLACEMENT LOGIC
+    // ==========================================
+    const statusText = document.getElementById("ar-status");
+    let hitTestSource = null;
+    let hitTestSourceRequested = false;
+
+    // The targeting circle
+    const reticle = new THREE.Mesh(
+      new THREE.RingGeometry(0.05, 0.07, 32).rotateX(-Math.PI / 2),
+      new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+    );
+    reticle.matrixAutoUpdate = false;
+    reticle.visible = false;
+    scene.add(reticle);
+
+    // Tap to Place Event
+    const controller = renderer.xr.getController(0);
+    controller.addEventListener('select', () => {
+      if (reticle.visible) {
+        solarSystem.position.setFromMatrixPosition(reticle.matrix);
+        solarSystem.visible = true;
+        reticle.visible = false;
+        statusText.innerText = "System Placed! Enjoy.";
+      }
+    });
+    scene.add(controller);
+
+    // ==========================================
+    // RENDER LOOP
+    // ==========================================
+    const speedControl = document.getElementById("speed");
+
+    renderer.setAnimationLoop((timestamp, frame) => {
+      if (frame) {
+        const referenceSpace = renderer.xr.getReferenceSpace();
+        const session = renderer.xr.getSession();
+
+        // 1. Request Hit Test if not already done
+        if (!hitTestSourceRequested) {
+          session.requestReferenceSpace('viewer').then((refSpace) => {
+            session.requestHitTestSource({ space: refSpace }).then((source) => {
+              hitTestSource = source;
+            });
+          });
+          hitTestSourceRequested = true;
+          statusText.innerText = "Point camera at floor and move slowly...";
+        }
+
+        // 2. Perform Hit Test (if solar system isn't placed yet)
+        if (hitTestSource && !solarSystem.visible) {
+          const hitTestResults = frame.getHitTestResults(hitTestSource);
+          if (hitTestResults.length > 0) {
+            const hit = hitTestResults[0];
+            reticle.visible = true;
+            reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+            statusText.innerText = "Surface Found! Tap to Place.";
+          } else {
+            reticle.visible = false;
+          }
+        }
+      }
+
+      // 3. Animate the planets
+      planets.forEach(p => {
+        p.pivot.rotation.y += p.speed * (speedControl ? parseFloat(speedControl.value) : 1);
+        p.mesh.rotation.y += 0.005;
+      });
+
+      renderer.render(scene, camera);
+    });
+
+    // Window Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
