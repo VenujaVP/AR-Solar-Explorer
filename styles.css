@@ -168,3 +168,25 @@ body {
 
 .danger-btn { background: #e53e3e; width: 90%; padding: 15px; font-size: 1.2rem; }
 .hidden { display: none !important; }
+
+/* NEW: Planet Selector Bar */
+#planet-selector {
+    pointer-events: auto;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    background: rgba(11, 13, 23, 0.85);
+    padding: 15px 25px;
+    border-radius: 50px;
+    border: 1px solid #4facfe;
+    backdrop-filter: blur(5px);
+    z-index: 900;
+}
+
+#planet-selector .ar-btn {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+}

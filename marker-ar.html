@@ -20,28 +20,32 @@
          ================================================================ -->
     <div id="ar-ui-container" class="hidden">
       
-      <!-- Top Control Bar -->
+      <!-- Top Control Bar (Visible in Solar System view) -->
       <div id="top-controls">
-        <button id="btn-play-pause" class="ar-btn">⏸ Pause Orbits</button>
-        <button id="btn-toggle-orbits" class="ar-btn">⭕ Show Paths</button>
-        <button id="btn-toggle-bg" class="ar-btn">🌌 Background: OFF</button>
+        <button id="btn-play-pause" class="glass-btn">⏸ Pause Orbits</button>
+        <button id="btn-toggle-orbits" class="glass-btn">⭕ Show Paths</button>
+        <button id="btn-toggle-bg" class="glass-btn">🌌 Background: OFF</button>
       </div>
 
-      <!-- NEW: Bottom Planet Selector (Visible only in normal view) -->
+      <!-- Professional Planet Selector Dock -->
       <div id="planet-selector">
-        <button id="btn-focus-sun" class="ar-btn">☀️ Sun</button>
-        <button id="btn-focus-earth" class="ar-btn">🌍 Earth</button>
-        <button id="btn-focus-moon" class="ar-btn">🌙 Moon</button>
+        <button id="btn-focus-sun" class="dock-btn">☀️ Sun</button>
+        <button id="btn-focus-earth" class="dock-btn">🌍 Earth</button>
+        <button id="btn-focus-moon" class="dock-btn">🌙 Moon</button>
       </div>
 
-      <!-- Planet Focus Panel (Strictly Bottom Half) -->
+      <!-- NEW: Explore Mode Top Buttons (Back & Pause) -->
+      <div id="focus-top-ui" class="hidden">
+        <button id="btn-exit-focus" class="action-btn top-left">❮ Back</button>
+        <button id="btn-focus-spin" class="action-btn top-right">⏸ Pause Spin</button>
+      </div>
+
+      <!-- Planet Focus Panel (Bottom 40%, Scrollable Details) -->
       <div id="focus-panel" class="hidden">
         <h2 id="focus-title">Planet</h2>
-        <p id="focus-desc">Description goes here.</p>
-        <div class="focus-controls">
-          <button id="btn-focus-spin" class="ar-btn">⏸ Pause Spin</button>
+        <div class="scroll-area">
+          <p id="focus-desc">Description goes here.</p>
         </div>
-        <button id="btn-exit-focus" class="ar-btn danger-btn">← Back to Solar System</button>
       </div>
 
     </div>
@@ -63,7 +67,6 @@
         <img id="spaceTexture" src="./markers/space.jpg">
       </a-assets>
 
-      <!-- Raycaster is GONE. Standard camera only. -->
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-light type="ambient" color="#cccccc" intensity="1"></a-light>
@@ -85,9 +88,7 @@
 
           <!-- EARTH PIVOT -->
           <a-entity id="earth-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-            
             <a-entity id="earth-container" position="2 0 0">
-              
               <!-- EARTH MODEL -->
               <a-entity id="earth-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
                 <a-gltf-model id="earth-model" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
@@ -98,12 +99,10 @@
 
               <!-- MOON PIVOT -->
               <a-entity id="moon-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-                
                 <!-- MOON MODEL -->
                 <a-entity id="moon-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
                   <a-gltf-model id="moon-model" src="#moonModel" position="0.6 0 0" scale="0.15 0.15 0.15"></a-gltf-model>
                 </a-entity>
-                
               </a-entity>
             </a-entity>
           </a-entity> 
