@@ -1,5 +1,3 @@
-<!-- marker-ar.html -->
-
 <!doctype html>
 <html>
   <head>
@@ -18,23 +16,30 @@
 
   <body>
     <!-- ================================================================
-         THE AR UI OVERLAY (Hidden until marker is detected)
+         THE AR UI OVERLAY
          ================================================================ -->
     <div id="ar-ui-container" class="hidden">
       
-      <!-- Top Control Bar (Visible in Solar System view) -->
+      <!-- Top Control Bar -->
       <div id="top-controls">
         <button id="btn-play-pause" class="ar-btn">⏸ Pause Orbits</button>
         <button id="btn-toggle-orbits" class="ar-btn">⭕ Show Paths</button>
         <button id="btn-toggle-bg" class="ar-btn">🌌 Background: OFF</button>
       </div>
 
-      <!-- Planet Focus Panel (Bottom Half of Screen) -->
+      <!-- NEW: Bottom Planet Selector (Visible only in normal view) -->
+      <div id="planet-selector">
+        <button id="btn-focus-sun" class="ar-btn">☀️ Sun</button>
+        <button id="btn-focus-earth" class="ar-btn">🌍 Earth</button>
+        <button id="btn-focus-moon" class="ar-btn">🌙 Moon</button>
+      </div>
+
+      <!-- Planet Focus Panel (Strictly Bottom Half) -->
       <div id="focus-panel" class="hidden">
-        <h2>🌍 Earth</h2>
-        <p>Third planet from the Sun. The only known world to harbor life.<br><br><b>Gestures:</b> Swipe to rotate, Pinch to zoom.</p>
+        <h2 id="focus-title">Planet</h2>
+        <p id="focus-desc">Description goes here.</p>
         <div class="focus-controls">
-          <button id="btn-focus-spin" class="ar-btn">⏸ Pause Earth Spin</button>
+          <button id="btn-focus-spin" class="ar-btn">⏸ Pause Spin</button>
         </div>
         <button id="btn-exit-focus" class="ar-btn danger-btn">← Back to Solar System</button>
       </div>
@@ -58,47 +63,48 @@
         <img id="spaceTexture" src="./markers/space.jpg">
       </a-assets>
 
-      <!-- Raycaster for tapping the Earth model -->
-      <a-camera position="0 0 0" look-controls="enabled: false" cursor="rayOrigin: mouse; fuse: false" raycaster="objects: .clickable"></a-camera>
+      <!-- Raycaster is GONE. Standard camera only. -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-light type="ambient" color="#cccccc" intensity="1"></a-light>
       <a-light type="point" position="0 0 0" color="#ffffff" intensity="2"></a-light>
 
-      <!-- Target Entity tracking -->
       <a-entity id="target-entity" mindar-image-target="targetIndex: 0">
         
-        <!-- Space Background (Placed directly on the marker under the system) -->
-        <a-image id="space-bg" src="#spaceTexture" position="0 0 0" rotation="0 0 0" width="3" height="3" visible="false"></a-image>
+        <a-image id="space-bg" src="#spaceTexture" position="0 0 -3" width="8" height="8" visible="false"></a-image>
 
-        <!-- ROOT: Touch gestures apply here. Rotated 90 on X so orbits lay flat -->
         <a-entity id="solar-system-root" rotation="90 0 0" scale="0.2 0.2 0.2">
 
           <!-- SUN -->
           <a-entity id="sun-wrapper" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-            <a-gltf-model src="#sunModel"></a-gltf-model>
+            <a-gltf-model id="sun-model" src="#sunModel"></a-gltf-model>
           </a-entity>
 
-          <!-- EARTH ORBIT PATH (Using torus for perfect 3D visibility) -->
-          <a-torus id="earth-path" class="orbit-path" radius="2" radius-tubular="0.015" color="#ffffff" opacity="0.6" rotation="90 0 0" visible="false"></a-torus>
+          <!-- EARTH ORBIT PATH -->
+          <a-torus id="earth-path" class="orbit-path" radius="2" radius-tubular="0.015" color="#ffffff" opacity="0.6" rotation="0 0 0" visible="false"></a-torus>
 
           <!-- EARTH PIVOT -->
           <a-entity id="earth-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
             
             <a-entity id="earth-container" position="2 0 0">
               
-              <!-- EARTH MODEL (Clickable) -->
-              <a-entity id="earth-spin" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
-                <a-gltf-model id="earth-model" class="clickable" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
+              <!-- EARTH MODEL -->
+              <a-entity id="earth-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
+                <a-gltf-model id="earth-model" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
               </a-entity>
 
               <!-- MOON ORBIT PATH -->
-              <a-torus id="moon-path" class="orbit-path" radius="0.6" radius-tubular="0.01" color="#ffffff" opacity="0.6" rotation="90 0 0" visible="false"></a-torus>
+              <a-torus id="moon-path" class="orbit-path" radius="0.6" radius-tubular="0.01" color="#ffffff" opacity="0.6" rotation="0 0 0" visible="false"></a-torus>
 
               <!-- MOON PIVOT -->
               <a-entity id="moon-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-                <a-gltf-model id="moon-model" src="#moonModel" position="0.6 0 0" scale="0.15 0.15 0.15"></a-gltf-model>
+                
+                <!-- MOON MODEL -->
+                <a-entity id="moon-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
+                  <a-gltf-model id="moon-model" src="#moonModel" position="0.6 0 0" scale="0.15 0.15 0.15"></a-gltf-model>
+                </a-entity>
+                
               </a-entity>
-
             </a-entity>
           </a-entity> 
           

@@ -141,13 +141,14 @@ body {
 }
 
 /* Perfect Bottom-Half Panel for Focus Mode */
+/* Ensure the Focus Panel rigidly occupies the bottom 50% */
 #focus-panel {
     pointer-events: auto;
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 45vh; /* Covers the bottom half of the screen */
+    height: 50vh; 
     background: rgba(11, 13, 23, 0.95);
     border-top: 2px solid #4facfe;
     border-radius: 20px 20px 0 0;
@@ -158,11 +159,12 @@ body {
     text-align: center;
     padding: 20px;
     box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+    z-index: 1000;
 }
 
-#focus-panel h2 { color: #00f2fe; margin-bottom: 10px; font-size: 2rem; }
-#focus-panel p { color: #e2e8f0; margin-bottom: 20px; font-size: 1rem; line-height: 1.4; flex-grow: 1; }
-.focus-controls { margin-bottom: 15px; }
+#focus-panel h2 { color: #00f2fe; margin-bottom: 10px; font-size: 2.2rem; }
+#focus-panel p { color: #e2e8f0; margin-bottom: 20px; font-size: 1.1rem; line-height: 1.5; flex-grow: 1; }
+.focus-controls { margin-bottom: 15px; width: 100%; }
 
-.danger-btn { background: #e53e3e; width: 80%; padding: 12px; }
+.danger-btn { background: #e53e3e; width: 90%; padding: 15px; font-size: 1.2rem; }
 .hidden { display: none !important; }
