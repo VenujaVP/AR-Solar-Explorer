@@ -1,3 +1,5 @@
+// interactions.js
+
 document.addEventListener("DOMContentLoaded", () => {
     // === STATE VARIABLES ===
     let isPlaying = true;
@@ -38,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
         e.target.innerText = isPlaying ? "⏸ Pause Orbits" : "▶ Play Orbits";
         animTargets.forEach(el => el.emit(isPlaying ? 'resumeOrbit' : 'pauseOrbit'));
         
-        // Also sync earth spin if we are NOT in focus mode
         if(!inFocusMode) {
             earthSpinning = isPlaying;
             earthSpin.emit(isPlaying ? 'resumeSpin' : 'pauseSpin');
@@ -62,12 +63,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // === 3. TOUCH GESTURES (Pinch Zoom & Swipe Rotate) ===
     let initialDistance = 0;
     let currentScale = 0.2;
-    let currentFocusScale = 1.2;
+    let currentFocusScale = 1.0;
     let previousTouchX = 0;
     let currentRotZ = 0;
     let currentFocusRotY = 0;
 
     document.addEventListener('touchstart', (e) => {
+        // Prevent default touch actions on the UI so pinch doesn't zoom the web browser
+        if(e.target.closest('#focus-panel') || e.target.closest('#top-controls')) return; 
+
         if (e.touches.length === 2) {
             initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
         } else if (e.touches.length === 1) {
@@ -76,14 +80,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener('touchmove', (e) => {
+        if(e.target.closest('#focus-panel') || e.target.closest('#top-controls')) return;
+
         // Two fingers: SCALE
         if (e.touches.length === 2) {
             let newDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-            let scaleDelta = (newDistance - initialDistance) * 0.005;
+            let scaleDelta = (newDistance - initialDistance) * 0.003;
             initialDistance = newDistance; 
             
             if (inFocusMode) {
-                currentFocusScale = Math.max(0.5, Math.min(3.0, currentFocusScale + scaleDelta));
+                currentFocusScale = Math.max(0.3, Math.min(3.0, currentFocusScale + scaleDelta));
                 earthModel.setAttribute('scale', `${currentFocusScale} ${currentFocusScale} ${currentFocusScale}`);
             } else {
                 currentScale = Math.max(0.05, Math.min(1.0, currentScale + scaleDelta));
@@ -96,10 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
             previousTouchX = e.touches[0].pageX;
             
             if (inFocusMode) {
-                currentFocusRotY += deltaX * 0.8; // Swipe to rotate Earth manually
+                currentFocusRotY += deltaX * 0.8; 
                 earthModel.setAttribute('rotation', `0 ${currentFocusRotY} 0`);
             } else {
-                currentRotZ += deltaX * 0.8; // Swipe to rotate Solar System
+                currentRotZ += deltaX * 0.8; 
                 root.setAttribute('rotation', `90 0 ${currentRotZ}`);
             }
         }
@@ -113,18 +119,21 @@ document.addEventListener("DOMContentLoaded", () => {
         topControls.classList.add("hidden");
         focusPanel.classList.remove("hidden");
 
-        // Hide everything else
+        // Hide everything else so only Earth is visible
         sunWrapper.setAttribute("visible", false);
         moonPivot.setAttribute("visible", false);
         spaceBg.setAttribute("visible", false);
         orbitPaths.forEach(el => el.setAttribute("visible", false));
 
-        // Stop main orbits and bring Earth to center
+        // Stop orbits to freeze the system
         animTargets.forEach(el => el.emit('pauseOrbit'));
-        earthPivot.setAttribute("rotation", "0 0 0"); 
-        earthContainer.setAttribute("position", "0 0 0"); 
         
-        // Scale up for focus
+        // Reset pivot and move Earth up into the camera view (top half)
+        earthPivot.setAttribute("rotation", "0 0 0"); 
+        // Z-axis pushes it UP off the physical marker toward the camera
+        earthContainer.setAttribute("position", "0 0 2"); 
+        
+        // Scale it up for inspection
         currentFocusScale = 1.2;
         earthModel.setAttribute("scale", `${currentFocusScale} ${currentFocusScale} ${currentFocusScale}`);
         
@@ -154,10 +163,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (bgVisible) spaceBg.setAttribute("visible", true);
         if (pathsVisible) orbitPaths.forEach(el => el.setAttribute("visible", true));
 
-        // Move Earth back to orbit
+        // Move Earth back to its exact orbit position
         earthContainer.setAttribute("position", "2 0 0");
         earthModel.setAttribute("scale", "0.4 0.4 0.4");
-        earthModel.setAttribute("rotation", "0 0 0"); // Reset manual touch rotation
+        earthModel.setAttribute("rotation", "0 0 0"); 
 
         // Sync spin back to master play state
         earthSpinning = isPlaying;
