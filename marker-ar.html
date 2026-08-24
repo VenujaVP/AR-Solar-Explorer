@@ -9,17 +9,16 @@
 
     <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <!-- Import our custom interactions script -->
     <script src="interactions.js" defer></script>
     
-    <style> body { margin: 0; overflow: hidden; } </style>
+    <style> body { margin: 0; overflow: hidden; touch-action: none; } </style>
   </head>
 
   <body>
     <!-- ================================================================
-         THE AR UI OVERLAY
+         THE AR UI OVERLAY (Hidden until marker is detected)
          ================================================================ -->
-    <div id="ar-ui-container">
+    <div id="ar-ui-container" class="hidden">
       
       <!-- Top Control Bar -->
       <div id="top-controls">
@@ -28,22 +27,12 @@
         <button id="btn-toggle-bg" class="ar-btn">🌌 Background: OFF</button>
       </div>
 
-      <!-- Bottom Control Bar (System Move/Scale/Rotate) -->
-      <div id="system-controls">
-        <span>Adjust System:</span>
-        <button id="btn-scale-down" class="icon-btn">➖</button>
-        <button id="btn-scale-up" class="icon-btn">➕</button>
-        <button id="btn-rotate-left" class="icon-btn">↺</button>
-        <button id="btn-rotate-right" class="icon-btn">↻</button>
-      </div>
-
       <!-- Planet Focus Panel (Hidden by default) -->
       <div id="focus-panel" class="hidden">
         <h2>🌍 Earth</h2>
-        <p>Third planet from the Sun. The only known world to harbor life.</p>
+        <p>Third planet from the Sun. Swipe to rotate, pinch to zoom.</p>
         <div class="focus-controls">
-          <button id="btn-focus-zoom-in" class="icon-btn">🔍+</button>
-          <button id="btn-focus-zoom-out" class="icon-btn">🔍-</button>
+          <button id="btn-focus-spin" class="ar-btn">⏸ Pause Earth Spin</button>
         </div>
         <button id="btn-exit-focus" class="ar-btn danger-btn">← Back to Solar System</button>
       </div>
@@ -67,18 +56,19 @@
         <img id="spaceTexture" src="./markers/space.jpg">
       </a-assets>
 
-      <!-- Raycaster added to camera to detect screen taps on 3D models -->
       <a-camera position="0 0 0" look-controls="enabled: false" cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-camera>
 
       <a-light type="ambient" color="#cccccc" intensity="1"></a-light>
       <a-light type="point" position="0 0 0" color="#ffffff" intensity="2"></a-light>
 
-      <!-- The Space Background (Hidden by default) -->
-      <a-sky id="space-bg" src="#spaceTexture" visible="false"></a-sky>
-
-      <a-entity mindar-image-target="targetIndex: 0">
-        <!-- ROOT: We apply scale and manual rotations here -->
+      <!-- Target Entity tracking added here -->
+      <a-entity id="target-entity" mindar-image-target="targetIndex: 0">
+        
+        <!-- ROOT: Touch gestures apply here -->
         <a-entity id="solar-system-root" rotation="90 0 0" scale="0.2 0.2 0.2">
+
+          <!-- Space Background (Placed UNDER the solar system) -->
+          <a-plane id="space-bg" src="#spaceTexture" width="10" height="10" position="0 0 -0.5" visible="false"></a-plane>
 
           <!-- SUN -->
           <a-entity id="sun-wrapper" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
@@ -88,13 +78,13 @@
           <!-- EARTH ORBIT PATH -->
           <a-ring id="earth-path" class="orbit-path" radius-inner="1.98" radius-outer="2.02" color="#ffffff" opacity="0.4" visible="false"></a-ring>
 
-          <!-- EARTH PIVOT (Revolves around Sun) -->
+          <!-- EARTH PIVOT -->
           <a-entity id="earth-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
             
             <a-entity id="earth-container" position="2 0 0">
               
               <!-- EARTH MODEL (Clickable) -->
-              <a-entity id="earth-spin" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+              <a-entity id="earth-spin" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
                 <a-gltf-model id="earth-model" class="clickable" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
               </a-entity>
 
@@ -107,7 +97,7 @@
               </a-entity>
 
             </a-entity>
-          </a-entity> <!-- End Earth Pivot -->
+          </a-entity> 
           
         </a-entity>
       </a-entity>

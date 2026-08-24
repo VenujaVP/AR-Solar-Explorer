@@ -4,11 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let pathsVisible = false;
     let bgVisible = false;
     let inFocusMode = false;
-    let systemScale = 0.2;
-    let systemRotationZ = 0;
-    let focusEarthScale = 0.4;
+    let earthSpinning = true;
 
     // === ELEMENTS ===
+    const targetEntity = document.querySelector("#target-entity");
+    const uiContainer = document.querySelector("#ar-ui-container");
     const root = document.querySelector("#solar-system-root");
     const animTargets = document.querySelectorAll(".anim-target");
     const orbitPaths = document.querySelectorAll(".orbit-path");
@@ -16,121 +16,155 @@ document.addEventListener("DOMContentLoaded", () => {
     const sunWrapper = document.querySelector("#sun-wrapper");
     const earthPivot = document.querySelector("#earth-pivot");
     const earthContainer = document.querySelector("#earth-container");
+    const earthSpin = document.querySelector("#earth-spin");
     const earthModel = document.querySelector("#earth-model");
     const moonPivot = document.querySelector("#moon-pivot");
     const spaceBg = document.querySelector("#space-bg");
 
     const focusPanel = document.querySelector("#focus-panel");
     const topControls = document.querySelector("#top-controls");
-    const systemControls = document.querySelector("#system-controls");
 
-    // === PLAY / PAUSE ORBITS ===
+    // === 1. MARKER DETECTION (Show/Hide UI) ===
+    targetEntity.addEventListener("targetFound", () => {
+        uiContainer.classList.remove("hidden");
+    });
+    targetEntity.addEventListener("targetLost", () => {
+        uiContainer.classList.add("hidden");
+    });
+
+    // === 2. TOP CONTROLS ===
     document.querySelector("#btn-play-pause").addEventListener("click", (e) => {
         isPlaying = !isPlaying;
         e.target.innerText = isPlaying ? "⏸ Pause Orbits" : "▶ Play Orbits";
-        animTargets.forEach(el => {
-            el.emit(isPlaying ? 'resumeOrbit' : 'pauseOrbit');
-        });
+        animTargets.forEach(el => el.emit(isPlaying ? 'resumeOrbit' : 'pauseOrbit'));
+        
+        // Also sync earth spin if we are NOT in focus mode
+        if(!inFocusMode) {
+            earthSpinning = isPlaying;
+            earthSpin.emit(isPlaying ? 'resumeSpin' : 'pauseSpin');
+        }
     });
 
-    // === TOGGLE ORBIT PATHS ===
     document.querySelector("#btn-toggle-orbits").addEventListener("click", (e) => {
         pathsVisible = !pathsVisible;
         e.target.innerText = pathsVisible ? "⭕ Hide Paths" : "⭕ Show Paths";
-        // Only show if we aren't in focus mode
         if (!inFocusMode) {
             orbitPaths.forEach(el => el.setAttribute("visible", pathsVisible));
         }
     });
 
-    // === TOGGLE BACKGROUND ===
     document.querySelector("#btn-toggle-bg").addEventListener("click", (e) => {
         bgVisible = !bgVisible;
         e.target.innerText = bgVisible ? "🌌 Background: ON" : "🌌 Background: OFF";
         spaceBg.setAttribute("visible", bgVisible);
     });
 
-    // === SYSTEM CONTROLS (Scale & Rotate) ===
-    document.querySelector("#btn-scale-up").addEventListener("click", () => {
-        if (systemScale < 0.6) systemScale += 0.05;
-        root.setAttribute("scale", `${systemScale} ${systemScale} ${systemScale}`);
-    });
-    
-    document.querySelector("#btn-scale-down").addEventListener("click", () => {
-        if (systemScale > 0.05) systemScale -= 0.05;
-        root.setAttribute("scale", `${systemScale} ${systemScale} ${systemScale}`);
-    });
+    // === 3. TOUCH GESTURES (Pinch Zoom & Swipe Rotate) ===
+    let initialDistance = 0;
+    let currentScale = 0.2;
+    let currentFocusScale = 1.2;
+    let previousTouchX = 0;
+    let currentRotZ = 0;
+    let currentFocusRotY = 0;
 
-    document.querySelector("#btn-rotate-left").addEventListener("click", () => {
-        systemRotationZ -= 15;
-        root.setAttribute("rotation", `90 0 ${systemRotationZ}`);
-    });
-
-    document.querySelector("#btn-rotate-right").addEventListener("click", () => {
-        systemRotationZ += 15;
-        root.setAttribute("rotation", `90 0 ${systemRotationZ}`);
-    });
-
-    // === EARTH FOCUS MODE (The Complex Interaction) ===
-    earthModel.addEventListener("click", () => {
-        if (inFocusMode) return; // Prevent double clicks
-        inFocusMode = true;
-
-        // 1. Hide UI and show Focus Panel
-        topControls.classList.add("hidden");
-        systemControls.classList.add("hidden");
-        focusPanel.classList.remove("hidden");
-
-        // 2. Hide everything else
-        sunWrapper.setAttribute("visible", false);
-        moonPivot.setAttribute("visible", false);
-        orbitPaths.forEach(el => el.setAttribute("visible", false));
-
-        // 3. Pause orbits and move Earth to center of the marker
-        animTargets.forEach(el => el.emit('pauseOrbit'));
-        earthPivot.setAttribute("rotation", "0 0 0"); // Reset orbit angle
-        earthContainer.setAttribute("position", "0 0 0"); // Move to center
-        
-        // 4. Make Earth huge for inspection
-        focusEarthScale = 1.2;
-        earthModel.setAttribute("scale", `${focusEarthScale} ${focusEarthScale} ${focusEarthScale}`);
-        
-        // Ensure Earth keeps spinning on its axis
-        document.querySelector("#earth-spin").emit('resumeOrbit');
-    });
-
-    // === EXIT FOCUS MODE ===
-    document.querySelector("#btn-exit-focus").addEventListener("click", () => {
-        inFocusMode = false;
-
-        // 1. Restore UI
-        topControls.classList.remove("hidden");
-        systemControls.classList.remove("hidden");
-        focusPanel.classList.add("hidden");
-
-        // 2. Restore visibility
-        sunWrapper.setAttribute("visible", true);
-        moonPivot.setAttribute("visible", true);
-        if (pathsVisible) orbitPaths.forEach(el => el.setAttribute("visible", true));
-
-        // 3. Move Earth back to its orbit position
-        earthContainer.setAttribute("position", "2 0 0");
-        earthModel.setAttribute("scale", "0.4 0.4 0.4"); // Restore original scale
-
-        // 4. Resume all orbits if the global play state is true
-        if (isPlaying) {
-            animTargets.forEach(el => el.emit('resumeOrbit'));
+    document.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+        } else if (e.touches.length === 1) {
+            previousTouchX = e.touches[0].pageX;
         }
     });
 
-    // === FOCUS MODE ZOOM CONTROLS ===
-    document.querySelector("#btn-focus-zoom-in").addEventListener("click", () => {
-        if (focusEarthScale < 3.0) focusEarthScale += 0.2;
-        earthModel.setAttribute("scale", `${focusEarthScale} ${focusEarthScale} ${focusEarthScale}`);
+    document.addEventListener('touchmove', (e) => {
+        // Two fingers: SCALE
+        if (e.touches.length === 2) {
+            let newDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+            let scaleDelta = (newDistance - initialDistance) * 0.005;
+            initialDistance = newDistance; 
+            
+            if (inFocusMode) {
+                currentFocusScale = Math.max(0.5, Math.min(3.0, currentFocusScale + scaleDelta));
+                earthModel.setAttribute('scale', `${currentFocusScale} ${currentFocusScale} ${currentFocusScale}`);
+            } else {
+                currentScale = Math.max(0.05, Math.min(1.0, currentScale + scaleDelta));
+                root.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+            }
+        } 
+        // One finger: ROTATE
+        else if (e.touches.length === 1) {
+            let deltaX = e.touches[0].pageX - previousTouchX;
+            previousTouchX = e.touches[0].pageX;
+            
+            if (inFocusMode) {
+                currentFocusRotY += deltaX * 0.8; // Swipe to rotate Earth manually
+                earthModel.setAttribute('rotation', `0 ${currentFocusRotY} 0`);
+            } else {
+                currentRotZ += deltaX * 0.8; // Swipe to rotate Solar System
+                root.setAttribute('rotation', `90 0 ${currentRotZ}`);
+            }
+        }
     });
 
-    document.querySelector("#btn-focus-zoom-out").addEventListener("click", () => {
-        if (focusEarthScale > 0.5) focusEarthScale -= 0.2;
-        earthModel.setAttribute("scale", `${focusEarthScale} ${focusEarthScale} ${focusEarthScale}`);
+    // === 4. EARTH FOCUS MODE ===
+    earthModel.addEventListener("click", () => {
+        if (inFocusMode) return;
+        inFocusMode = true;
+
+        topControls.classList.add("hidden");
+        focusPanel.classList.remove("hidden");
+
+        // Hide everything else
+        sunWrapper.setAttribute("visible", false);
+        moonPivot.setAttribute("visible", false);
+        spaceBg.setAttribute("visible", false);
+        orbitPaths.forEach(el => el.setAttribute("visible", false));
+
+        // Stop main orbits and bring Earth to center
+        animTargets.forEach(el => el.emit('pauseOrbit'));
+        earthPivot.setAttribute("rotation", "0 0 0"); 
+        earthContainer.setAttribute("position", "0 0 0"); 
+        
+        // Scale up for focus
+        currentFocusScale = 1.2;
+        earthModel.setAttribute("scale", `${currentFocusScale} ${currentFocusScale} ${currentFocusScale}`);
+        
+        // Ensure Earth spin logic continues independently
+        earthSpinning = true;
+        document.querySelector("#btn-focus-spin").innerText = "⏸ Pause Earth Spin";
+        earthSpin.emit('resumeSpin');
+    });
+
+    // Toggle Earth Spin inside Focus Mode
+    document.querySelector("#btn-focus-spin").addEventListener("click", (e) => {
+        earthSpinning = !earthSpinning;
+        e.target.innerText = earthSpinning ? "⏸ Pause Earth Spin" : "▶ Resume Earth Spin";
+        earthSpin.emit(earthSpinning ? 'resumeSpin' : 'pauseSpin');
+    });
+
+    // === 5. EXIT FOCUS MODE ===
+    document.querySelector("#btn-exit-focus").addEventListener("click", () => {
+        inFocusMode = false;
+
+        topControls.classList.remove("hidden");
+        focusPanel.classList.add("hidden");
+
+        // Restore visibility
+        sunWrapper.setAttribute("visible", true);
+        moonPivot.setAttribute("visible", true);
+        if (bgVisible) spaceBg.setAttribute("visible", true);
+        if (pathsVisible) orbitPaths.forEach(el => el.setAttribute("visible", true));
+
+        // Move Earth back to orbit
+        earthContainer.setAttribute("position", "2 0 0");
+        earthModel.setAttribute("scale", "0.4 0.4 0.4");
+        earthModel.setAttribute("rotation", "0 0 0"); // Reset manual touch rotation
+
+        // Sync spin back to master play state
+        earthSpinning = isPlaying;
+        earthSpin.emit(isPlaying ? 'resumeSpin' : 'pauseSpin');
+
+        if (isPlaying) {
+            animTargets.forEach(el => el.emit('resumeOrbit'));
+        }
     });
 });

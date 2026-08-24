@@ -154,11 +154,6 @@ body {
     height: 45px;
 }
 
-#system-controls span {
-    color: white;
-    align-self: center;
-    font-weight: bold;
-}
 
 #focus-panel {
     position: absolute;
