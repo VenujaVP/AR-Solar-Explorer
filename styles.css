@@ -1,0 +1,106 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0b0d17; /* Deep space dark blue */
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Header */
+.header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    background: -webkit-linear-gradient(#4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header p {
+    color: #a0aec0;
+    font-size: 1rem;
+}
+
+/* Menu Cards */
+.menu-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    background: #1a202c;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #2d3748;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #e2e8f0;
+}
+
+.card p {
+    color: #a0aec0;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* Buttons */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.primary-btn {
+    background-color: #3182ce;
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: #2b6cb0;
+}
+
+.secondary-btn {
+    background-color: #4a5568;
+    color: white;
+}
+
+.secondary-btn:hover {
+    background-color: #2d3748;
+}
+
+/* Footer */
+.footer {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #4a5568;
+}

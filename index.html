@@ -1,69 +1,42 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Solar Explorer</title>
+    <!-- Link to our stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <header class="header">
+            <h1>AR Solar Explorer</h1>
+            <p>Explore the Solar System in Augmented Reality</p>
+        </header>
 
-    <!-- A-Frame: the 3D engine. Gives us <a-scene>, <a-entity>, <a-camera>. -->
-    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+        <main class="menu-cards">
+            <!-- Marker AR Option -->
+            <div class="card">
+                <h2>Marker AR</h2>
+                <p>Use your camera to scan the Solar System image target and watch the planets orbit.</p>
+                <!-- This link connects directly to the AR file we built earlier -->
+                <a href="marker-ar.html" class="btn primary-btn">Start Marker AR</a>
+            </div>
 
-    <!-- MindAR: the image tracking. Finds your marker in the camera feed -->
-    <!-- and works out where it is in 3D space, every frame.              -->
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+            <!-- Markerless AR Option -->
+            <div class="card">
+                <h2>Markerless AR</h2>
+                <p>Detect a flat surface like a table or floor and place the Solar System in your room.</p>
+                <!-- This will link to the markerless file we build next -->
+                <a href="markerless-ar.html" class="btn secondary-btn">Start Markerless AR</a>
+            </div>
+        </main>
 
-    <!-- Kill the default page margin so the camera fills the screen. -->
-    <style> body { margin: 0; } </style>
-  </head>
-
-  <body>
-    <!-- ================================================================
-         THE SCENE
-         imageTargetSrc points at YOUR compiled marker file. This name
-         must match the file in your folder EXACTLY, capitals included.
-         ================================================================ -->
-    <a-scene
-      mindar-image="imageTargetSrc: ./markers/targets.mind;"
-      color-space="sRGB"
-      renderer="colorManagement: true, physicallyCorrectLights"
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false"
-    >
-
-      <!-- Load the 3D model up front, before the scene starts running. -->
-      <a-assets>
-        <a-asset-item id="myModel" src="./models/model.glb"></a-asset-item>
-      </a-assets>
-
-      <!-- The AR camera. Leave this alone - MindAR drives it for you. -->
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-      <!-- ==============================================================
-           WHAT APPEARS ON THE MARKER
-           Anything inside this entity is hidden until the marker is seen,
-           then it sticks to it. targetIndex: 0 = the first (only) image
-           inside targets.mind.
-           ============================================================== -->
-      <a-entity mindar-image-target="targetIndex: 0">
-
-        <!-- YOUR MODEL. These are the three lines you tune:
-
-               position = "x y z"   left/right, up/down, off the marker
-                                    (raise the 3rd number to lift it)
-               scale    = "x y z"   change all three together;
-                                    smaller number = smaller model
-               rotation = "x y z"   in degrees. glTF models often need
-                                    x=90 to lie flat on the marker
-
-             Model invisible? It is probably enormous and you are inside
-             it - try scale="0.02 0.02 0.02". Or tiny - try "2 2 2".      -->
-        <a-gltf-model
-          src="#myModel"
-          position="0 0 0.1"
-          scale="0.2 0.2 0.2"
-          rotation="90 0 0"
-        ></a-gltf-model>
-
-      </a-entity>
-    </a-scene>
-  </body>
+        <footer class="footer">
+            <p>INTE 42312 – Virtual and Augmented Reality</p>
+        </footer>
+        
+    </div>
+</body>
 </html>

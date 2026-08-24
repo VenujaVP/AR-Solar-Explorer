@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Marker AR - Solar System</title>
+
+    <!-- A-Frame: the 3D engine -->
+    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+
+    <!-- MindAR: the image tracking -->
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+    <!-- Kill the default page margin so the camera fills the screen -->
+    <style> body { margin: 0; overflow: hidden; } </style>
+  </head>
+
+  <body>
+    <!-- ================================================================
+         THE SCENE
+         ================================================================ -->
+    <a-scene
+      mindar-image="imageTargetSrc: ./markers/targets.mind; autoStart: true;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+
+      <!-- 1. LOAD THE 3D MODELS -->
+      <a-assets>
+        <a-asset-item id="sunModel" src="./models/sun.glb"></a-asset-item>
+        <a-asset-item id="earthModel" src="./models/earth.glb"></a-asset-item>
+        <a-asset-item id="moonModel" src="./models/moon.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- 2. THE AR CAMERA -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- 3. LIGHTING -->
+      <a-light type="ambient" color="#cccccc" intensity="1"></a-light>
+      <a-light type="point" position="0 0 0" color="#ffffff" intensity="2"></a-light>
+
+      <!-- ==============================================================
+           THE AR TRACKING TARGET
+           ============================================================== -->
+      <a-entity mindar-image-target="targetIndex: 0">
+
+        <!-- SOLAR SYSTEM ROOT 
+             Rotated 90 degrees so the planets orbit flat on the physical marker, 
+             and scaled down to fit on the screen -->
+        <a-entity rotation="90 0 0" scale="0.2 0.2 0.2">
+
+          <!-- ================= THE SUN ================= -->
+          <!-- The Sun rotates on its own axis every 10 seconds -->
+          <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+            <a-gltf-model src="#sunModel" position="0 0 0" scale="1 1 1"></a-gltf-model>
+          </a-entity>
+
+          <!-- ================= THE EARTH ================= -->
+          <!-- EARTH ORBIT: This invisible pivot rotates around the Sun every 15 seconds -->
+          <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear">
+            
+            <!-- THE EARTH MODEL: Pushed out 2 units on the X-axis from the center. 
+                 It rotates on its own axis every 5 seconds. -->
+            <a-entity position="2 0 0">
+              <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+                <a-gltf-model src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
+              </a-entity>
+            </a-entity>
+
+            <!-- ================= THE MOON ================= -->
+            <!-- MOON ORBIT: Centered precisely on Earth's position (2 0 0).
+                 It rotates around the Earth every 4 seconds. -->
+            <a-entity position="2 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
+              
+              <!-- THE MOON MODEL: Pushed out 0.6 units from the Earth -->
+              <a-entity position="0.6 0 0">
+                <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
+                  <a-gltf-model src="#moonModel" scale="0.15 0.15 0.15"></a-gltf-model>
+                </a-entity>
+              </a-entity>
+
+            </a-entity>
+            
+          </a-entity> <!-- End Earth Orbit -->
+
+        </a-entity> <!-- End Solar System Root -->
+      </a-entity> <!-- End MindAR Target -->
+
+    </a-scene>
+  </body>
+</html>
