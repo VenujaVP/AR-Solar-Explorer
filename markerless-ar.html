@@ -14,12 +14,11 @@
 
     body {
       overflow: hidden;
-      background-color: #0b0d17; /* Matches dashboard theme */
+      background-color: #0b0d17;
       color: #ffffff;
       touch-action: none;
     }
 
-    /* === PRE-AR LAUNCH OVERLAY (No more white screen) === */
     #launch-screen {
       position: fixed;
       top: 0;
@@ -70,7 +69,6 @@
       font-size: 0.9rem;
     }
 
-    /* === IN-AR UI OVERLAYS (Visible on top of Camera) === */
     #ar-ui {
       position: fixed;
       top: 0;
@@ -79,10 +77,9 @@
       height: 100vh;
       pointer-events: none;
       z-index: 1000;
-      display: none; /* Shown when AR session starts */
+      display: none;
     }
 
-    /* Top Control Bar */
     #top-bar {
       position: absolute;
       top: 15px;
@@ -112,7 +109,6 @@
       background: rgba(79, 172, 254, 0.3);
     }
 
-    /* Dynamic Detection Status Pill */
     #ar-status {
       position: absolute;
       top: 65px;
@@ -132,7 +128,6 @@
       pointer-events: none;
     }
 
-    /* Bottom Speed Control */
     #speed-container {
       position: absolute;
       bottom: 25px;
@@ -162,9 +157,8 @@
     }
   </style>
 </head>
-<body>
 
-  <!-- 1. PRE-AR LAUNCH CONTAINER -->
+<body>
   <div id="launch-screen">
     <div class="launch-card">
       <h1>Markerless AR</h1>
@@ -174,7 +168,6 @@
     </div>
   </div>
 
-  <!-- 2. IN-AR INTERFACE (WebXR DOM Overlay) -->
   <div id="ar-ui">
     <div id="top-bar">
       <a href="index.html" class="glass-btn">❮ Exit AR</a>
@@ -189,12 +182,10 @@
     </div>
   </div>
 
-  <!-- Import Three.js and WebXR ARButton -->
   <script type="module">
     import * as THREE from 'https://unpkg.com/three@0.147.0/build/three.module.js';
     import { ARButton } from 'https://unpkg.com/three@0.147.0/examples/jsm/webxr/ARButton.js';
 
-    // === UI REFERENCES ===
     const launchScreen = document.getElementById('launch-screen');
     const arUi = document.getElementById('ar-ui');
     const statusText = document.getElementById('ar-status');
@@ -202,26 +193,28 @@
     const btnTogglePaths = document.getElementById('btn-toggle-paths');
     const arButtonSlot = document.getElementById('ar-button-slot');
 
-    // === 1. THREE.JS SCENE SETUP ===
+    const detectionSound = new Audio('./sounds/pop.mp3');
+    detectionSound.preload = 'auto';
+    detectionSound.volume = 0.9;
+
+    let detectionSoundPlayed = false;
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
     scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
-    // Transparent Renderer for WebXR Camera Pass-through
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.xr.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // === 2. WEBXR AR BUTTON WITH DOM OVERLAY ===
     const arButton = ARButton.createButton(renderer, {
       requiredFeatures: ['hit-test'],
       optionalFeatures: ['dom-overlay'],
       domOverlay: { root: document.body }
     });
 
-    // Style the ARButton to fit the launch card design
     arButton.style.position = 'static';
     arButton.style.width = '100%';
     arButton.style.padding = '14px';
@@ -234,10 +227,10 @@
     arButton.style.cursor = 'pointer';
     arButtonSlot.appendChild(arButton);
 
-    // Handle AR Session Lifecycle
     renderer.xr.addEventListener('sessionstart', () => {
       launchScreen.style.display = 'none';
       arUi.style.display = 'block';
+      detectionSoundPlayed = false;
     });
 
     renderer.xr.addEventListener('sessionend', () => {
@@ -245,43 +238,40 @@
       arUi.style.display = 'none';
       isPlaced = false;
       solarSystem.visible = false;
+      detectionSoundPlayed = false;
     });
 
-    // === 3. SOLAR SYSTEM HIERARCHY ===
     const solarSystem = new THREE.Group();
     solarSystem.visible = false;
     scene.add(solarSystem);
 
-    const SCALE = 0.015; // Scaled to fit comfortably on desks/floors
+    const SCALE = 0.015;
     const orbitPathMeshes = [];
     let pathsVisible = false;
 
-    // Sun
     const sunTexture = new THREE.TextureLoader().load("textures/sun.jpg");
     const sun = new THREE.Mesh(
       new THREE.SphereGeometry(8 * SCALE, 32, 32),
-      new THREE.MeshBasicMaterial({ map: sunTexture }) 
+      new THREE.MeshBasicMaterial({ map: sunTexture })
     );
     solarSystem.add(sun);
-    
-    const sunLight = new THREE.PointLight(0xffffff, 2, 5); 
+
+    const sunLight = new THREE.PointLight(0xffffff, 2, 5);
     sunLight.castShadow = true;
     sun.add(sunLight);
 
-    // Planet Generator Function with Orbit Paths
     function createPlanet(name, size, distance, speed, texturePath, cloudPath, moonTexture, ringTexture) {
       const texture = new THREE.TextureLoader().load(texturePath);
       const mesh = new THREE.Mesh(
         new THREE.SphereGeometry(size * SCALE, 32, 32),
         new THREE.MeshStandardMaterial({ map: texture })
       );
-      
+
       const pivot = new THREE.Object3D();
       mesh.position.x = distance * SCALE;
       pivot.add(mesh);
       solarSystem.add(pivot);
 
-      // Clouds
       if (cloudPath) {
         const cloudTex = new THREE.TextureLoader().load(cloudPath);
         const cloudMesh = new THREE.Mesh(
@@ -290,8 +280,7 @@
         );
         mesh.add(cloudMesh);
       }
-      
-      // Moon
+
       if (moonTexture) {
         const moonTex = new THREE.TextureLoader().load(moonTexture);
         const moonMesh = new THREE.Mesh(
@@ -303,8 +292,7 @@
         moonPivot.add(moonMesh);
         mesh.add(moonPivot);
       }
-      
-      // Ring
+
       if (ringTexture) {
         const ringTex = new THREE.TextureLoader().load(ringTexture);
         const ring = new THREE.Mesh(
@@ -315,7 +303,6 @@
         mesh.add(ring);
       }
 
-      // Orbit Path Ring
       const orbitPath = new THREE.Mesh(
         new THREE.RingGeometry((distance * SCALE) - 0.002, (distance * SCALE) + 0.002, 64),
         new THREE.MeshBasicMaterial({ color: 0x4facfe, side: THREE.DoubleSide, transparent: true, opacity: 0.4 })
@@ -324,11 +311,10 @@
       orbitPath.visible = false;
       solarSystem.add(orbitPath);
       orbitPathMeshes.push(orbitPath);
-      
+
       return { mesh, pivot, speed };
     }
 
-    // Build the 8 Planets
     const planets = [
       createPlanet("Mercury", 1.5, 12, 0.01, "textures/mercury.jpg"),
       createPlanet("Venus", 2, 18, 0.007, "textures/venus.jpg"),
@@ -340,19 +326,16 @@
       createPlanet("Neptune", 3, 60, 0.001, "textures/neptune.jpg")
     ];
 
-    // === 4. TOGGLE ORBIT PATHS BUTTON ===
     btnTogglePaths.addEventListener('click', () => {
       pathsVisible = !pathsVisible;
       btnTogglePaths.innerText = pathsVisible ? "⭕ Hide Paths" : "⭕ Show Paths";
       orbitPathMeshes.forEach(path => path.visible = pathsVisible);
     });
 
-    // === 5. WEBXR HIT TESTING & TAP TO PLACE ===
     let hitTestSource = null;
     let hitTestSourceRequested = false;
     let isPlaced = false;
 
-    // Targeting Indicator (Green Ring)
     const reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.06, 0.08, 32).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial({ color: 0x00ff00 })
@@ -361,7 +344,15 @@
     reticle.visible = false;
     scene.add(reticle);
 
-    // Tap to Place Controller
+    const playDetectionSound = () => {
+      if (detectionSoundPlayed) return;
+      detectionSound.currentTime = 0;
+      detectionSound.play().catch(() => {
+        // Ignore autoplay restrictions if browser blocks audio until user interaction.
+      });
+      detectionSoundPlayed = true;
+    };
+
     const controller = renderer.xr.getController(0);
     controller.addEventListener('select', () => {
       if (reticle.visible && !isPlaced) {
@@ -369,8 +360,8 @@
         solarSystem.visible = true;
         isPlaced = true;
         reticle.visible = false;
+
         statusText.innerText = "System anchored! Planets orbiting.";
-        
         setTimeout(() => {
           statusText.style.display = 'none';
         }, 3500);
@@ -378,7 +369,6 @@
     });
     scene.add(controller);
 
-    // === 6. ANIMATION & RENDER LOOP ===
     renderer.setAnimationLoop((timestamp, frame) => {
       if (frame && !isPlaced) {
         const referenceSpace = renderer.xr.getReferenceSpace();
@@ -395,21 +385,25 @@
 
         if (hitTestSource) {
           const hitTestResults = frame.getHitTestResults(hitTestSource);
+
           if (hitTestResults.length > 0) {
             const hit = hitTestResults[0];
             reticle.visible = true;
             reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+
             statusText.style.display = 'block';
             statusText.innerText = "Surface detected! Tap screen to place.";
+
+            playDetectionSound();
           } else {
             reticle.visible = false;
+            detectionSoundPlayed = false;
             statusText.style.display = 'block';
             statusText.innerText = "Scanning environment... Move camera slowly.";
           }
         }
       }
 
-      // Orbit Animations
       if (isPlaced) {
         const currentSpeed = speedSlider ? parseFloat(speedSlider.value) : 1;
         planets.forEach(p => {
@@ -421,7 +415,6 @@
       renderer.render(scene, camera);
     });
 
-    // Window Resize Handler
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
