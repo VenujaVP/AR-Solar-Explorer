@@ -87,10 +87,8 @@
       width: 100%;
       display: flex;
       justify-content: space-between;
-      align-items: center;
       padding: 0 15px;
       pointer-events: auto;
-      gap: 10px;
     }
 
     .glass-btn {
@@ -105,19 +103,10 @@
       cursor: pointer;
       text-decoration: none;
       box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-      touch-action: manipulation;
-      user-select: none;
     }
 
     .glass-btn:active {
       background: rgba(79, 172, 254, 0.3);
-    }
-
-    #top-bar .right-group {
-      margin-left: auto;
-      display: flex;
-      gap: 8px;
-      align-items: center;
     }
 
     #ar-status {
@@ -182,11 +171,7 @@
   <div id="ar-ui">
     <div id="top-bar">
       <a href="index.html" class="glass-btn">❮ Exit AR</a>
-
-      <div class="right-group">
-        <button id="btn-toggle-light" class="glass-btn">💡 Light ON</button>
-        <button id="btn-toggle-paths" class="glass-btn">⭕ Show Paths</button>
-      </div>
+      <button id="btn-toggle-paths" class="glass-btn">⭕ Show Paths</button>
     </div>
 
     <div id="ar-status">Scanning environment... Point at a flat surface.</div>
@@ -206,50 +191,22 @@
     const statusText = document.getElementById('ar-status');
     const speedSlider = document.getElementById('speed-slider');
     const btnTogglePaths = document.getElementById('btn-toggle-paths');
-    const btnToggleLight = document.getElementById('btn-toggle-light');
     const arButtonSlot = document.getElementById('ar-button-slot');
 
     const detectionSound = new Audio('./sounds/pop.mp3');
     detectionSound.preload = 'auto';
     detectionSound.volume = 0.9;
 
-    const switchSound = new Audio('./sounds/switch.mp3');
-    switchSound.preload = 'auto';
-    switchSound.volume = 0.8;
-
     let detectionSoundPlayed = false;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-
-    scene.add(camera);
-
-    // Camera-attached invisible light source
-    const cameraAmbient = new THREE.HemisphereLight(0xffffff, 0x101010, 0.4);
-    camera.add(cameraAmbient);
-
-    const cameraLight = new THREE.SpotLight(0xffffff, 1.5, 25, Math.PI / 6, 0.8, 2);
-    cameraLight.position.set(0, 2, 3);
-    cameraLight.target.position.set(0, 0, -1);
-    cameraLight.castShadow = true;
-    cameraLight.shadow.mapSize.width = 1024;
-    cameraLight.shadow.mapSize.height = 1024;
-    cameraLight.shadow.bias = -0.0001;
-    camera.add(cameraLight);
-    camera.add(cameraLight.target);
-
-    let lightEnabled = true;
-    cameraLight.visible = true;
-    cameraAmbient.visible = true;
+    scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.xr.enabled = true;
-
-    // Required shadow settings
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
 
     const arButton = ARButton.createButton(renderer, {
@@ -297,16 +254,10 @@
       new THREE.SphereGeometry(8 * SCALE, 32, 32),
       new THREE.MeshBasicMaterial({ map: sunTexture })
     );
-    sun.castShadow = true;
-    sun.receiveShadow = true;
     solarSystem.add(sun);
 
-    // Sun light remains hidden and is not rendered as a visible object
-    const sunLight = new THREE.PointLight(0xffffff, 1.8, 8);
+    const sunLight = new THREE.PointLight(0xffffff, 2, 5);
     sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 1024;
-    sunLight.shadow.mapSize.height = 1024;
-    sunLight.position.set(0, 0, 0);
     sun.add(sunLight);
 
     function createPlanet(name, size, distance, speed, texturePath, cloudPath, moonTexture, ringTexture) {
@@ -315,9 +266,6 @@
         new THREE.SphereGeometry(size * SCALE, 32, 32),
         new THREE.MeshStandardMaterial({ map: texture })
       );
-
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
 
       const pivot = new THREE.Object3D();
       mesh.position.x = distance * SCALE;
@@ -328,14 +276,8 @@
         const cloudTex = new THREE.TextureLoader().load(cloudPath);
         const cloudMesh = new THREE.Mesh(
           new THREE.SphereGeometry((size + 0.05) * SCALE, 32, 32),
-          new THREE.MeshStandardMaterial({
-            map: cloudTex,
-            transparent: true,
-            opacity: 0.6
-          })
+          new THREE.MeshStandardMaterial({ map: cloudTex, transparent: true, opacity: 0.6 })
         );
-        cloudMesh.castShadow = true;
-        cloudMesh.receiveShadow = true;
         mesh.add(cloudMesh);
       }
 
@@ -345,9 +287,6 @@
           new THREE.SphereGeometry(0.8 * SCALE, 16, 16),
           new THREE.MeshStandardMaterial({ map: moonTex })
         );
-        moonMesh.castShadow = true;
-        moonMesh.receiveShadow = true;
-
         const moonPivot = new THREE.Object3D();
         moonMesh.position.x = (size + 2) * SCALE;
         moonPivot.add(moonMesh);
@@ -358,25 +297,15 @@
         const ringTex = new THREE.TextureLoader().load(ringTexture);
         const ring = new THREE.Mesh(
           new THREE.RingGeometry((size + 1) * SCALE, (size + 3) * SCALE, 32),
-          new THREE.MeshBasicMaterial({
-            map: ringTex,
-            side: THREE.DoubleSide,
-            transparent: true
-          })
+          new THREE.MeshBasicMaterial({ map: ringTex, side: THREE.DoubleSide, transparent: true })
         );
         ring.rotation.x = Math.PI / 2;
-        ring.receiveShadow = true;
         mesh.add(ring);
       }
 
       const orbitPath = new THREE.Mesh(
         new THREE.RingGeometry((distance * SCALE) - 0.002, (distance * SCALE) + 0.002, 64),
-        new THREE.MeshBasicMaterial({
-          color: 0x4facfe,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.4
-        })
+        new THREE.MeshBasicMaterial({ color: 0x4facfe, side: THREE.DoubleSide, transparent: true, opacity: 0.4 })
       );
       orbitPath.rotation.x = Math.PI / 2;
       orbitPath.visible = false;
@@ -396,26 +325,6 @@
       createPlanet("Uranus", 3, 52, 0.0015, "textures/uranus.jpg"),
       createPlanet("Neptune", 3, 60, 0.001, "textures/neptune.jpg")
     ];
-
-    function playToggleSound() {
-      switchSound.currentTime = 0;
-      switchSound.play().catch(() => {
-        // Ignore autoplay restrictions until user interaction.
-      });
-    }
-
-    btnToggleLight.addEventListener('click', () => {
-      lightEnabled = !lightEnabled;
-
-      cameraLight.visible = lightEnabled;
-      cameraAmbient.visible = lightEnabled;
-      sunLight.visible = lightEnabled;
-
-      renderer.shadowMap.enabled = lightEnabled;
-
-      btnToggleLight.textContent = lightEnabled ? "💡 Light ON" : "💡 Light OFF";
-      playToggleSound();
-    });
 
     btnTogglePaths.addEventListener('click', () => {
       pathsVisible = !pathsVisible;
@@ -502,12 +411,6 @@
           p.mesh.rotation.y += 0.005;
         });
       }
-
-      // Keep the invisible light attached to the phone camera each frame
-      cameraLight.position.copy(camera.position);
-      cameraLight.position.z += 3;
-      cameraLight.position.y += 2;
-      cameraLight.target.position.set(0, 0, -2);
 
       renderer.render(scene, camera);
     });
