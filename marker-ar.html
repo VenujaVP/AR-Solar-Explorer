@@ -6,36 +6,32 @@
 
   <title>Marker AR - Interactive Solar System</title>
 
-  <!-- Core AR Libraries -->
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  
-  <!-- Your Custom Interaction Logic -->
   <script src="interactions.js" defer></script>
 
-  <!-- ISOLATED CSS: Only applies to this Marker AR page -->
   <style>
-    /* Global Reset & Native Fonts */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
       background: #000000;
-      touch-action: none; /* Prevents accidental zooming/scrolling on mobile */
+      touch-action: none;
     }
 
     body {
       color: #ffffff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
     }
 
-    /* A-Frame Canvas Setup */
     a-scene {
       position: fixed;
       inset: 0;
@@ -43,33 +39,24 @@
       height: 100%;
     }
 
-    /* ========================================================
-       AR INTERFACE OVERLAYS
-       ======================================================== */
     #ar-ui-container {
       position: absolute;
       z-index: 999;
       inset: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none; /* Let clicks pass through to the 3D scene where needed */
+      pointer-events: none;
     }
 
-    /* Base Button Styles */
-    .glass-btn, .dock-btn, .action-btn {
+    .glass-btn,
+    .dock-btn,
+    .action-btn {
       color: #ffffff;
-      font-family: inherit;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
       cursor: pointer;
       touch-action: manipulation;
       user-select: none;
-    }
-
-    /* Top Controls (Glassmorphism) */
-    #top-controls {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      padding: 15px;
     }
 
     .glass-btn {
@@ -80,13 +67,16 @@
       background: rgba(20, 25, 40, 0.68);
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       font-size: 0.9rem;
       font-weight: 600;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
     }
 
-    .glass-btn:hover, .glass-btn:focus-visible {
+    .glass-btn:hover,
+    .glass-btn:focus-visible {
       border-color: #00f2fe;
       background: rgba(35, 48, 75, 0.9);
     }
@@ -95,7 +85,13 @@
       transform: scale(0.97);
     }
 
-    /* Planet Selector Dock (Bottom) */
+    #top-controls {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 15px;
+    }
+
     #planet-selector {
       position: absolute;
       bottom: 30px;
@@ -112,7 +108,6 @@
       transform: translateX(-50%);
       pointer-events: auto;
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
     .dock-btn {
@@ -123,10 +118,15 @@
       color: #e2e8f0;
       font-size: 0.95rem;
       font-weight: 600;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
     }
 
-    .dock-btn:hover, .dock-btn:focus-visible, .dock-btn:active {
+    .dock-btn:hover,
+    .dock-btn:focus-visible,
+    .dock-btn:active {
       border-color: #00f2fe;
       background: rgba(79, 172, 254, 0.3);
     }
@@ -135,7 +135,6 @@
       transform: scale(0.96);
     }
 
-    /* Focus Mode UI (When a planet is selected) */
     #focus-top-ui {
       position: absolute;
       top: 20px;
@@ -154,12 +153,12 @@
       background: rgba(10, 15, 30, 0.82);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
       font-size: 0.9rem;
       font-weight: 700;
     }
 
-    .action-btn:hover, .action-btn:focus-visible {
+    .action-btn:hover,
+    .action-btn:focus-visible {
       background: rgba(79, 172, 254, 0.3);
     }
 
@@ -170,11 +169,15 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      height: 40vh; /* Leaves top 60% of screen for the 3D model */
+      height: 40vh;
       padding: 25px 20px;
       border-top: 1px solid #4facfe;
       border-radius: 25px 25px 0 0;
-      background: linear-gradient(180deg, rgba(15, 20, 35, 0.92) 0%, rgba(5, 8, 15, 1) 100%);
+      background: linear-gradient(
+        180deg,
+        rgba(15, 20, 35, 0.92) 0%,
+        rgba(5, 8, 15, 1) 100%
+      );
       box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.7);
       pointer-events: auto;
     }
@@ -203,41 +206,48 @@
       display: none !important;
     }
 
-    /* Mobile Responsiveness */
     @media (max-width: 600px) {
       #top-controls {
         flex-wrap: wrap;
         gap: 6px;
         padding: 12px 8px;
       }
+
       .glass-btn {
         padding: 7px 9px;
         font-size: 0.76rem;
       }
+
       #planet-selector {
         bottom: 18px;
         gap: 5px;
         padding: 8px;
       }
+
       .dock-btn {
         padding: 8px 10px;
         font-size: 0.78rem;
       }
+
       #focus-top-ui {
         top: 12px;
         padding: 0 12px;
       }
+
       .action-btn {
         padding: 8px 11px;
         font-size: 0.78rem;
       }
+
       #focus-panel {
         height: 43vh;
         padding: 20px 16px;
       }
+
       #focus-title {
         font-size: 1.45rem;
       }
+
       #focus-desc {
         font-size: 0.92rem;
       }
@@ -246,14 +256,19 @@
 </head>
 
 <body>
-  <!-- ========================================================
-       2D UI OVERLAYS
-       ======================================================== -->
   <div id="ar-ui-container" class="hidden">
     <div id="top-controls">
-      <button id="btn-play-pause" class="glass-btn">⏸ Pause Orbits</button>
-      <button id="btn-toggle-orbits" class="glass-btn">⭕ Show Paths</button>
-      <button id="btn-toggle-bg" class="glass-btn">🌌 Background: OFF</button>
+      <button id="btn-play-pause" class="glass-btn">
+        ⏸ Pause Orbits
+      </button>
+
+      <button id="btn-toggle-orbits" class="glass-btn">
+        ⭕ Show Paths
+      </button>
+
+      <button id="btn-toggle-bg" class="glass-btn">
+        🌌 Background: OFF
+      </button>
     </div>
 
     <div id="planet-selector">
@@ -263,21 +278,24 @@
     </div>
 
     <div id="focus-top-ui" class="hidden">
-      <button id="btn-exit-focus" class="action-btn">❮ Back</button>
-      <button id="btn-focus-spin" class="action-btn">⏸ Pause Spin</button>
+      <button id="btn-exit-focus" class="action-btn">
+        ❮ Back
+      </button>
+
+      <button id="btn-focus-spin" class="action-btn">
+        ⏸ Pause Spin
+      </button>
     </div>
 
     <div id="focus-panel" class="hidden">
       <h2 id="focus-title">Planet</h2>
+
       <div class="scroll-area">
         <p id="focus-desc">Description goes here.</p>
       </div>
     </div>
   </div>
 
-  <!-- ========================================================
-       3D AR SCENE
-       ======================================================== -->
   <a-scene
     mindar-image="imageTargetSrc: ./markers/targets.mind; autoStart: true;"
     color-space="sRGB"
@@ -286,62 +304,167 @@
     device-orientation-permission-ui="enabled: false"
   >
     <a-assets>
-      <a-asset-item id="sunModel" src="./models/sun.glb"></a-asset-item>
-      <a-asset-item id="earthModel" src="./models/earth.glb"></a-asset-item>
-      <a-asset-item id="moonModel" src="./models/moon.glb"></a-asset-item>
-      <img id="spaceTexture" src="./markers/space.jpg" alt="Space background">
+      <a-asset-item
+        id="sunModel"
+        src="./models/sun.glb">
+      </a-asset-item>
+
+      <a-asset-item
+        id="earthModel"
+        src="./models/earth.glb">
+      </a-asset-item>
+
+      <a-asset-item
+        id="moonModel"
+        src="./models/moon.glb">
+      </a-asset-item>
+
+      <img
+        id="spaceTexture"
+        src="./markers/space.jpg"
+        alt="Space background">
     </a-assets>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
 
-    <a-light type="ambient" color="#cccccc" intensity="1"></a-light>
-    <a-light type="point" position="0 0 0" color="#ffffff" intensity="2"></a-light>
+    <a-light
+      type="ambient"
+      color="#cccccc"
+      intensity="1">
+    </a-light>
 
-    <a-entity id="target-entity" mindar-image-target="targetIndex: 0">
+    <a-light
+      type="point"
+      position="0 0 0"
+      color="#ffffff"
+      intensity="2">
+    </a-light>
 
-      <a-image id="space-bg" src="#spaceTexture" position="0 0 -3" width="8" height="8" visible="false"></a-image>
+    <a-entity
+      id="target-entity"
+      mindar-image-target="targetIndex: 0">
 
-      <a-entity id="solar-system-root" rotation="90 0 0" scale="0.2 0.2 0.2">
+      <a-image
+        id="space-bg"
+        src="#spaceTexture"
+        position="0 0 -3"
+        width="8"
+        height="8"
+        visible="false">
+      </a-image>
 
-        <!-- Sun -->
-        <a-entity id="sun-wrapper" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-          <a-gltf-model id="sun-main" src="#sunModel"></a-gltf-model>
+      <a-entity
+        id="solar-system-root"
+        rotation="90 0 0"
+        scale="0.2 0.2 0.2">
+
+        <a-entity
+          id="sun-wrapper"
+          class="anim-target"
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+
+          <a-gltf-model
+            id="sun-main"
+            src="#sunModel">
+          </a-gltf-model>
         </a-entity>
 
-        <!-- Earth Orbit Path -->
-        <a-torus id="earth-path" class="orbit-path" radius="2" radius-tubular="0.015" color="#ffffff" opacity="0.6" rotation="0 0 0" visible="false"></a-torus>
+        <a-torus
+          id="earth-path"
+          class="orbit-path"
+          radius="2"
+          radius-tubular="0.015"
+          color="#ffffff"
+          opacity="0.6"
+          rotation="0 0 0"
+          visible="false">
+        </a-torus>
 
-        <!-- Earth & Moon System -->
-        <a-entity id="earth-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-          <a-entity id="earth-container" position="2 0 0">
-            
-            <a-entity id="earth-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
-              <a-gltf-model id="earth-main" src="#earthModel" scale="0.4 0.4 0.4"></a-gltf-model>
+        <a-entity
+          id="earth-pivot"
+          class="anim-target"
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+
+          <a-entity
+            id="earth-container"
+            position="2 0 0">
+
+            <a-entity
+              id="earth-spin"
+              class="spin-target"
+              animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
+
+              <a-gltf-model
+                id="earth-main"
+                src="#earthModel"
+                scale="0.4 0.4 0.4">
+              </a-gltf-model>
             </a-entity>
 
-            <!-- Moon Orbit Path -->
-            <a-torus id="moon-path" class="orbit-path" radius="0.6" radius-tubular="0.01" color="#ffffff" opacity="0.6" rotation="0 0 0" visible="false"></a-torus>
+            <a-torus
+              id="moon-path"
+              class="orbit-path"
+              radius="0.6"
+              radius-tubular="0.01"
+              color="#ffffff"
+              opacity="0.6"
+              rotation="0 0 0"
+              visible="false">
+            </a-torus>
 
-            <!-- Moon -->
-            <a-entity id="moon-pivot" class="anim-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
-              <a-entity id="moon-spin" class="spin-target" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
-                <a-gltf-model id="moon-main" src="#moonModel" position="0.6 0 0" scale="0.15 0.15 0.15"></a-gltf-model>
+            <a-entity
+              id="moon-pivot"
+              class="anim-target"
+              animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear; pauseEvents: pauseOrbit; resumeEvents: resumeOrbit">
+
+              <a-entity
+                id="moon-spin"
+                class="spin-target"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear; pauseEvents: pauseSpin; resumeEvents: resumeSpin">
+
+                <a-gltf-model
+                  id="moon-main"
+                  src="#moonModel"
+                  position="0.6 0 0"
+                  scale="0.15 0.15 0.15">
+                </a-gltf-model>
               </a-entity>
             </a-entity>
-            
           </a-entity>
         </a-entity>
       </a-entity>
 
-      <!-- Focus View (Hidden by default) -->
-      <a-entity id="focus-root" position="0 0.2 0" visible="false">
-        <a-entity id="focus-spin-wrapper" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseFocusSpin; resumeEvents: resumeFocusSpin">
-          <a-gltf-model id="focus-model-sun" src="#sunModel" visible="false"></a-gltf-model>
-          <a-gltf-model id="focus-model-earth" src="#earthModel" visible="false"></a-gltf-model>
-          <a-gltf-model id="focus-model-moon" src="#moonModel" visible="false"></a-gltf-model>
+      <a-entity
+        id="focus-root"
+        position="0 0.2 0"
+        visible="false">
+
+        <a-entity
+          id="focus-spin-wrapper"
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear; pauseEvents: pauseFocusSpin; resumeEvents: resumeFocusSpin">
+
+          <a-gltf-model
+            id="focus-model-sun"
+            src="#sunModel"
+            visible="false">
+          </a-gltf-model>
+
+          <a-gltf-model
+            id="focus-model-earth"
+            src="#earthModel"
+            visible="false">
+          </a-gltf-model>
+
+          <a-gltf-model
+            id="focus-model-moon"
+            src="#moonModel"
+            visible="false">
+          </a-gltf-model>
         </a-entity>
       </a-entity>
-      
     </a-entity>
   </a-scene>
 </body>
