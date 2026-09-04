@@ -1,5 +1,5 @@
 /* ========================================================
-   GLOBAL VARIABLES & RESET (No External Fonts)
+   GLOBAL VARIABLES & RESET (Native Fonts Only)
    ======================================================== */
 :root {
     --bg-dark: #05050a;
@@ -8,9 +8,8 @@
     --accent-purple: #4facfe;
     --text-main: #ffffff;
     --text-muted: #94a3b8;
-    /* Uses modern default fonts built into your device */
-    --font-heading: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -25,7 +24,7 @@ body {
         radial-gradient(circle at 15% 50%, rgba(79, 172, 254, 0.08) 0%, transparent 50%),
         radial-gradient(circle at 85% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 50%);
     color: var(--text-main);
-    font-family: var(--font-body);
+    font-family: var(--font-ui);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -33,35 +32,30 @@ body {
 }
 
 /* ========================================================
-   NAVIGATION & LAYOUT
+   NAVIGATION & HERO
    ======================================================== */
 .navbar {
     padding: 24px 5%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .logo {
-    font-family: var(--font-heading);
     font-weight: 700;
     font-size: 1.2rem;
     letter-spacing: 1px;
-    color: var(--text-main);
 }
 
 .dashboard-wrapper {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 40px 5%;
+    padding: 60px 5%;
     max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
 }
 
-/* ========================================================
-   HERO SECTION
-   ======================================================== */
 .hero {
     text-align: center;
     max-width: 800px;
@@ -83,7 +77,6 @@ body {
 }
 
 .hero h1 {
-    font-family: var(--font-heading);
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     font-weight: 700;
     line-height: 1.1;
@@ -106,31 +99,35 @@ body {
 }
 
 /* ========================================================
-   AR MODE CARDS (GRID)
+   GLASSMORPHISM UTILITY
+   ======================================================== */
+.glass-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    transition: transform 0.4s ease, border-color 0.4s ease;
+    overflow: hidden;
+}
+
+/* ========================================================
+   AR MODES GRID
    ======================================================== */
 .ar-modes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 30px;
     width: 100%;
+    margin-bottom: 80px;
 }
 
-.glass-panel {
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    padding: 40px;
-    position: relative;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s;
-    overflow: hidden;
-}
-
-.glass-panel:hover {
+.mode-card:hover {
     transform: translateY(-8px);
     border-color: rgba(79, 172, 254, 0.4);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .card-icon {
@@ -152,7 +149,6 @@ body {
 }
 
 .mode-card h2 {
-    font-family: var(--font-heading);
     font-size: 1.8rem;
     margin-bottom: 16px;
 }
@@ -161,7 +157,128 @@ body {
     color: var(--text-muted);
     line-height: 1.6;
     margin-bottom: 32px;
-    min-height: 80px; 
+    min-height: 80px;
+}
+
+/* ========================================================
+   SECTIONS: HOW IT WORKS & CREDITS
+   ======================================================== */
+.info-section, .credits-section {
+    width: 100%;
+    margin-bottom: 80px;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-label {
+    display: block;
+    color: var(--accent-purple);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.section-header h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/* Steps Grid */
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.step {
+    padding: 30px;
+    border-radius: 20px;
+}
+
+.step-number {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    font-size: 5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.03); /* Giant faded background number */
+    line-height: 1;
+    z-index: 0;
+}
+
+.step h3 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: var(--accent-blue);
+    position: relative;
+    z-index: 1;
+}
+
+.step p {
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Credits List */
+.credits-list {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    border-radius: 20px;
+}
+
+.credit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.credit-item:last-child {
+    border-bottom: none;
+}
+
+.credit-item strong {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.credit-item span {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    text-align: right;
+}
+
+.credit-item a {
+    color: var(--accent-purple);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.credit-item a:hover {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+/* Responsive adjustment for credits on mobile */
+@media (max-width: 600px) {
+    .credit-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .credit-item span {
+        text-align: left;
+    }
 }
 
 /* ========================================================
@@ -174,7 +291,6 @@ body {
     width: 100%;
     padding: 16px 24px;
     border-radius: 12px;
-    font-family: var(--font-heading);
     font-weight: 600;
     font-size: 1.05rem;
     text-decoration: none;
@@ -195,18 +311,17 @@ body {
     background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
     color: var(--bg-dark);
     border: none;
-    box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
 }
 
 .btn-primary:hover {
-    box-shadow: 0 15px 30px rgba(0, 242, 254, 0.4);
+    box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
     filter: brightness(1.1);
 }
 
 .btn-outline {
     background: transparent;
     color: var(--text-main);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-color);
 }
 
 .btn-outline:hover {
@@ -220,25 +335,7 @@ body {
 .main-footer {
     text-align: center;
     padding: 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-color);
     color: var(--text-muted);
     font-size: 0.9rem;
 }
-
-/* ========================================================
-   AR INTERFACE OVERLAYS
-   ======================================================== */
-#ar-ui-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
-.glass-btn { pointer-events: auto; background: rgba(20, 25, 40, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 8px 12px; border-radius: 8px; font-weight: 500; backdrop-filter: blur(8px); cursor: pointer; font-size: 0.9rem; transition: background 0.3s; }
-.glass-btn:active { background: rgba(255, 255, 255, 0.2); }
-#top-controls { display: flex; gap: 8px; justify-content: center; padding: 15px; }
-#planet-selector { pointer-events: auto; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(10, 15, 30, 0.7); padding: 10px 15px; border-radius: 30px; border: 1px solid rgba(79, 172, 254, 0.5); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-.dock-btn { background: transparent; color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s; }
-.dock-btn:active { background: rgba(79, 172, 254, 0.3); border-color: #4facfe; }
-#focus-top-ui { pointer-events: auto; position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; }
-.action-btn { background: rgba(10, 15, 30, 0.8); border: 1px solid rgba(79, 172, 254, 0.6); color: white; padding: 10px 16px; border-radius: 25px; font-weight: bold; backdrop-filter: blur(5px); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-#focus-panel { pointer-events: auto; position: absolute; bottom: 0; left: 0; width: 100%; height: 40vh; background: linear-gradient(180deg, rgba(15, 20, 35, 0.9) 0%, rgba(5, 8, 15, 1) 100%); border-top: 1px solid #4facfe; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; padding: 25px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.7); }
-#focus-title { color: #00f2fe; margin-bottom: 10px; font-size: 1.8rem; text-align: center; }
-.scroll-area { overflow-y: auto; flex-grow: 1; padding-right: 5px; }
-#focus-desc { color: #cbd5e0; font-size: 1rem; line-height: 1.6; text-align: left; }
-.hidden { display: none !important; }
