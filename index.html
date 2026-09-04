@@ -1,112 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Solar Explorer</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Solar Explorer</title>
+    <!-- Link to our stylesheet -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="site-shell">
-    <nav class="navbar">
-      <a href="index.html" class="brand">
-        <span class="brand-icon"><span></span></span>
-        <span>AR <b>Solar</b> Explorer</span>
-      </a>
+    <div class="dashboard-container">
+        
+        <header class="header">
+            <h1>AR Solar Explorer</h1>
+            <p>Explore the Solar System in Augmented Reality</p>
+        </header>
 
-      <span class="live-status">
-        <i></i> Interactive mission ready
-      </span>
-    </nav>
-
-    <main>
-      <section class="hero">
-        <div class="hero-content">
-          <p class="eyebrow">A new view of our neighborhood</p>
-          <h1>Meet the<br><em>solar system.</em></h1>
-          <p class="hero-description">
-            Bring the planets into your space. Explore their scale, motion,
-            and stories through an immersive augmented reality experience.
-          </p>
-
-          <div class="hero-actions">
-            <a href="markerless-ar.html" class="primary-button">
-              Launch experience <span>→</span>
-            </a>
-            <a href="marker-ar.html" class="text-button">Use an image marker</a>
-          </div>
-        </div>
-
-        <div class="solar-scene">
-          <span class="scene-label top-label">01 / Explore</span>
-
-          <div class="orbit orbit-one"></div>
-          <div class="orbit orbit-two"></div>
-          <div class="orbit orbit-three"></div>
-
-          <div class="sun"><span></span></div>
-          <div class="planet planet-blue"></div>
-          <div class="planet planet-red"></div>
-          <div class="planet planet-ring"><span></span></div>
-
-          <span class="scene-label bottom-label">Live planetary motion</span>
-        </div>
-      </section>
-
-      <section class="explore">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Choose your portal</p>
-            <h2>How will you explore?</h2>
-          </div>
-          <p>Two ways in. One universe to discover.</p>
-        </div>
-
-        <div class="mode-grid">
-          <a href="markerless-ar.html" class="mode-card light-card">
-            <div class="card-label">
-              <span>Recommended</span>
-              <span>01</span>
+        <main class="menu-cards">
+            <!-- Marker AR Option -->
+            <div class="card">
+                <h2>Marker AR</h2>
+                <p>Use your camera to scan the Solar System image target and watch the planets orbit.</p>
+                <!-- This link connects directly to the AR file we built earlier -->
+                <a href="marker-ar.html" class="btn primary-btn">Start Marker AR</a>
             </div>
 
-            <div class="mode-icon surface-icon"><span></span></div>
-
-            <h3>Place in your space</h3>
-            <p>
-              Find a table or floor with your camera, then drop a living
-              solar system into the room around you.
-            </p>
-
-            <strong>Start markerless AR ↗</strong>
-          </a>
-
-          <a href="marker-ar.html" class="mode-card dark-card">
-            <div class="card-label">
-              <span>Precision mode</span>
-              <span>02</span>
+            <!-- Markerless AR Option -->
+            <div class="card">
+                <h2>Markerless AR</h2>
+                <p>Detect a flat surface like a table or floor and place the Solar System in your room.</p>
+                <!-- This will link to the markerless file we build next -->
+                <a href="markerless-ar.html" class="btn secondary-btn">Start Markerless AR</a>
             </div>
+        </main>
 
-            <div class="mode-icon marker-icon">
-              <span></span>
-            </div>
-
-            <h3>Scan a mission marker</h3>
-            <p>
-              Point your camera at the solar system target to unlock a stable,
-              guided augmented reality model.
-            </p>
-
-            <strong>Start marker AR ↗</strong>
-          </a>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <span>AR SOLAR EXPLORER</span>
-      <span>Explore beyond the screen</span>
-      <span>2025</span>
-    </footer>
-  </div>
+        <footer class="footer">
+            <p>INTE 42312 – Virtual and Augmented Reality</p>
+        </footer>
+        
+    </div>
 </body>
 </html>
