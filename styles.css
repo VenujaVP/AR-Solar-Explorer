@@ -4,11 +4,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Uses whatever high-quality font is already built into the user's device */
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    background-color: #0b0d17; /* Deep space dark blue */
+    /* Deep space dark blue with a subtle glow in the center */
+    background: radial-gradient(circle at center, #1a2035 0%, #0b0d17 100%);
     color: #ffffff;
     display: flex;
     justify-content: center;
@@ -21,210 +23,128 @@ body {
 .dashboard-container {
     width: 90%;
     max-width: 500px;
-    padding: 20px;
+    padding: 30px 20px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 40px;
 }
 
 /* Header */
 .header h1 {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
-    background: -webkit-linear-gradient(#4facfe, #00f2fe);
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0px 4px 10px rgba(0, 242, 254, 0.3));
+    letter-spacing: -0.5px;
 }
 
 .header p {
     color: #a0aec0;
-    font-size: 1rem;
+    font-size: 1.05rem;
+    line-height: 1.5;
 }
 
 /* Menu Cards */
 .menu-cards {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
 .card {
-    background: #1a202c;
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #2d3748;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    background: rgba(26, 32, 44, 0.7);
+    padding: 30px 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(79, 172, 254, 0.6);
+    box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
 }
 
 .card h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #e2e8f0;
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+    color: #ffffff;
 }
 
 .card p {
-    color: #a0aec0;
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-    line-height: 1.5;
+    color: #cbd5e0;
+    font-size: 1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
 }
 
 /* Buttons */
 .btn {
     display: block;
     width: 100%;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 16px;
+    border-radius: 10px;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 1.1rem;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .primary-btn {
-    background-color: #3182ce;
-    color: white;
+    background: linear-gradient(135deg, #3182ce, #00f2fe);
+    color: #0b0d17;
+    box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+    border: none;
 }
 
 .primary-btn:hover {
-    background-color: #2b6cb0;
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+    transform: scale(1.02);
 }
 
 .secondary-btn {
-    background-color: #4a5568;
-    color: white;
+    background: rgba(74, 85, 104, 0.4);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .secondary-btn:hover {
-    background-color: #2d3748;
+    background: rgba(74, 85, 104, 0.8);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.02);
+}
+
+.btn:active {
+    transform: scale(0.98);
 }
 
 /* Footer */
 .footer {
-    margin-top: 20px;
-    font-size: 0.8rem;
+    margin-top: 10px;
+    font-size: 0.85rem;
     color: #4a5568;
+    letter-spacing: 0.5px;
 }
 
 /* ========================================================
-   AR INTERFACE OVERLAYS
+   AR INTERFACE OVERLAYS (Untouched to protect AR functionality)
    ======================================================== */
-#ar-ui-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; 
-    z-index: 999;
-}
-
-/* Glassmorphism Buttons */
-.glass-btn {
-    pointer-events: auto;
-    background: rgba(20, 25, 40, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: 500;
-    backdrop-filter: blur(8px);
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.3s;
-}
+#ar-ui-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+.glass-btn { pointer-events: auto; background: rgba(20, 25, 40, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 8px 12px; border-radius: 8px; font-weight: 500; backdrop-filter: blur(8px); cursor: pointer; font-size: 0.9rem; transition: background 0.3s; }
 .glass-btn:active { background: rgba(255, 255, 255, 0.2); }
-
-#top-controls {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    padding: 15px;
-}
-
-/* Professional Planet Selector Dock */
-#planet-selector {
-    pointer-events: auto;
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    background: rgba(10, 15, 30, 0.7);
-    padding: 10px 15px;
-    border-radius: 30px;
-    border: 1px solid rgba(79, 172, 254, 0.5);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-}
-
-.dock-btn {
-    background: transparent;
-    color: #e2e8f0;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
+#top-controls { display: flex; gap: 8px; justify-content: center; padding: 15px; }
+#planet-selector { pointer-events: auto; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(10, 15, 30, 0.7); padding: 10px 15px; border-radius: 30px; border: 1px solid rgba(79, 172, 254, 0.5); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+.dock-btn { background: transparent; color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s; }
 .dock-btn:active { background: rgba(79, 172, 254, 0.3); border-color: #4facfe; }
-
-/* Focus Mode Top Buttons (Small Back & Pause) */
-#focus-top-ui {
-    pointer-events: auto;
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-}
-
-.action-btn {
-    background: rgba(10, 15, 30, 0.8);
-    border: 1px solid rgba(79, 172, 254, 0.6);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 25px;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-
-/* Scrollable Focus Panel */
-#focus-panel {
-    pointer-events: auto;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 40vh; /* Leaves top 60% of screen for the 3D model */
-    background: linear-gradient(180deg, rgba(15, 20, 35, 0.9) 0%, rgba(5, 8, 15, 1) 100%);
-    border-top: 1px solid #4facfe;
-    border-radius: 25px 25px 0 0;
-    display: flex;
-    flex-direction: column;
-    padding: 25px 20px;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.7);
-}
-
+#focus-top-ui { pointer-events: auto; position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; }
+.action-btn { background: rgba(10, 15, 30, 0.8); border: 1px solid rgba(79, 172, 254, 0.6); color: white; padding: 10px 16px; border-radius: 25px; font-weight: bold; backdrop-filter: blur(5px); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+#focus-panel { pointer-events: auto; position: absolute; bottom: 0; left: 0; width: 100%; height: 40vh; background: linear-gradient(180deg, rgba(15, 20, 35, 0.9) 0%, rgba(5, 8, 15, 1) 100%); border-top: 1px solid #4facfe; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; padding: 25px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.7); }
 #focus-title { color: #00f2fe; margin-bottom: 10px; font-size: 1.8rem; text-align: center; }
-
-.scroll-area {
-    overflow-y: auto; /* Allows smooth vertical scrolling */
-    flex-grow: 1;
-    padding-right: 5px;
-}
-
-#focus-desc { 
-    color: #cbd5e0; 
-    font-size: 1rem; 
-    line-height: 1.6; 
-    text-align: left;
-}
-
+.scroll-area { overflow-y: auto; flex-grow: 1; padding-right: 5px; }
+#focus-desc { color: #cbd5e0; font-size: 1rem; line-height: 1.6; text-align: left; }
 .hidden { display: none !important; }
