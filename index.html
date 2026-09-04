@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Solar Explorer</title>
-    
-    <!-- Only your local CSS link -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
     <nav class="navbar">
         <div class="logo">✦ SolarExplorer AR</div>
     </nav>
@@ -17,35 +14,128 @@
     <div class="dashboard-wrapper">
         <header class="hero">
             <span class="tech-badge">Powered by WebXR</span>
-            <h1>Bring the <span class="text-glow">Universe</span><br>to Your Room</h1>
-            <p>Experience the Solar System in stunning augmented reality. No apps to download—just immersive, interactive spatial computing directly in your browser.</p>
+
+            <h1>
+                Bring the <span class="text-glow">Universe</span><br>
+                to Your Room
+            </h1>
+
+            <p>
+                Experience the Solar System in stunning augmented reality.
+                Choose an interactive AR mode below.
+            </p>
         </header>
 
-        <main class="ar-modes-grid">
-            <div class="mode-card glass-panel">
-                <div class="card-icon">🎯</div>
-                <h2>Target Tracking</h2>
-                <p>Use your camera to scan our dedicated Solar System marker. Watch the planets anchor and orbit in real-time over your physical document.</p>
-                <a href="marker-ar.html" class="btn btn-primary">
-                    Launch Marker Mode <span class="arrow">→</span>
-                </a>
-            </div>
+        <main>
+            <section class="ar-modes-grid" aria-label="AR modes">
+                <article class="mode-card glass-panel">
+                    <div class="card-icon">🎯</div>
+                    <h2>Target Tracking</h2>
 
-            <div class="mode-card glass-panel">
-                <div class="card-icon">🌌</div>
-                <div class="badge-new">Immersive</div>
-                <h2>Spatial Placement</h2>
-                <p>Detect a flat surface like your table or floor. Drop a massive, interactive 3D model of the Solar System right into your physical environment.</p>
-                <a href="markerless-ar.html" class="btn btn-outline">
-                    Launch Spatial Mode <span class="arrow">→</span>
-                </a>
-            </div>
+                    <p>
+                        Scan the Solar System marker using your camera.
+                        The planets will appear anchored to the physical marker.
+                    </p>
+
+                    <a href="marker-ar.html" class="btn btn-primary">
+                        Launch Marker Mode <span class="arrow">→</span>
+                    </a>
+                </article>
+
+                <article class="mode-card glass-panel">
+                    <div class="card-icon">🌌</div>
+                    <div class="badge-new">Immersive</div>
+
+                    <h2>Spatial Placement</h2>
+
+                    <p>
+                        Detect a flat surface such as a table or floor,
+                        then place the interactive Solar System in your room.
+                    </p>
+
+                    <a href="markerless-ar.html" class="btn btn-outline">
+                        Launch Spatial Mode <span class="arrow">→</span>
+                    </a>
+                </article>
+            </section>
+
+            <section class="info-section">
+                <span class="section-label">Quick guide</span>
+                <h2>How It Works</h2>
+
+                <div class="steps-grid">
+                    <article class="step">
+                        <span class="step-number">01</span>
+                        <h3>Choose a mode</h3>
+                        <p>
+                            Select marker-based AR or markerless spatial AR.
+                        </p>
+                    </article>
+
+                    <article class="step">
+                        <span class="step-number">02</span>
+                        <h3>Allow camera access</h3>
+                        <p>
+                            Your browser uses the camera to scan the marker
+                            or detect a flat surface.
+                        </p>
+                    </article>
+
+                    <article class="step">
+                        <span class="step-number">03</span>
+                        <h3>Explore the Solar System</h3>
+                        <p>
+                            View planets, control orbit paths, pause animations,
+                            zoom, rotate, and focus on individual models.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="credits-section">
+                <span class="section-label">Credits</span>
+                <h2>Assets and Tools</h2>
+
+                <div class="credits-list">
+                    <div class="credit-item">
+                        <strong>Target file creation</strong>
+                        <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile/"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            MindAR Image Target Compiler
+                        </a>
+                    </div>
+
+                    <div class="credit-item">
+                        <strong>3D model platform</strong>
+                        <a href="https://sketchfab.com/"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            Sketchfab
+                        </a>
+                    </div>
+
+                    <div class="credit-item">
+                        <strong>Sun model</strong>
+                        <span>Chaitanya Krishnan via Sketchfab</span>
+                    </div>
+
+                    <div class="credit-item">
+                        <strong>Moon model</strong>
+                        <span>JanesBT via Sketchfab</span>
+                    </div>
+
+                    <div class="credit-item">
+                        <strong>Earth model</strong>
+                        <span>3DGB via Sketchfab</span>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
     <footer class="main-footer">
         <p>INTE 42312 – Virtual and Augmented Reality</p>
     </footer>
-
 </body>
 </html>
