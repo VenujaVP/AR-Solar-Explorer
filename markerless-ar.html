@@ -87,7 +87,7 @@
       width: 100%;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       padding: 0 15px;
       pointer-events: auto;
       gap: 10px;
@@ -107,6 +107,7 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.4);
       touch-action: manipulation;
       user-select: none;
+      white-space: nowrap;
     }
 
     .glass-btn:active {
@@ -114,15 +115,16 @@
     }
 
     #top-bar .right-group {
-      margin-left: auto;
       display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
       gap: 8px;
-      align-items: center;
+      max-width: 70%;
     }
 
     #ar-status {
       position: absolute;
-      top: 65px;
+      top: 95px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(10, 15, 30, 0.85);
@@ -181,11 +183,13 @@
 
   <div id="ar-ui">
     <div id="top-bar">
-      <a href="index.html" class="glass-btn">❮ Exit AR</a>
+      <a href="index.html" class="glass-btn">❮ Exit</a>
 
       <div class="right-group">
         <button id="btn-toggle-light" class="glass-btn">💡 Light ON</button>
-        <button id="btn-toggle-paths" class="glass-btn">⭕ Show Paths</button>
+        <button id="btn-toggle-paths" class="glass-btn">⭕ Paths ON</button>
+        <button id="btn-toggle-labels" class="glass-btn">🏷️ Labels ON</button>
+        <button id="btn-toggle-realism" class="glass-btn">🔭 Real Orbits OFF</button>
       </div>
     </div>
 
@@ -207,29 +211,38 @@
     const speedSlider = document.getElementById('speed-slider');
     const btnTogglePaths = document.getElementById('btn-toggle-paths');
     const btnToggleLight = document.getElementById('btn-toggle-light');
+    const btnToggleLabels = document.getElementById('btn-toggle-labels');
+    const btnToggleRealism = document.getElementById('btn-toggle-realism');
     const arButtonSlot = document.getElementById('ar-button-slot');
 
-    // Existing detection sound
+    // UI States
+    let shadowLightEnabled = true;
+    let pathsVisible = true;
+    let labelsVisible = true;
+    let isRealisticMode = false;
+    let detectionSoundPlayed = false;
+
+    // Audio setup (ensure these exist in your folder)
     const detectionSound = new Audio('./sounds/pop.mp3');
     detectionSound.preload = 'auto';
     detectionSound.volume = 0.9;
-
-    // New switch sound for light toggle
     const switchSound = new Audio('./sounds/switch.mp3');
     switchSound.preload = 'auto';
     switchSound.volume = 0.85;
 
-    let detectionSoundPlayed = false;
+    function playSwitchSound() {
+      switchSound.currentTime = 0;
+      switchSound.play().catch(() => {});
+    }
 
+    // ThreeJS Setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 50);
     scene.add(camera);
 
-    // 1. NORMAL LIGHTING: permanent basic lighting, never disabled
     const normalAmbient = new THREE.HemisphereLight(0xffffff, 0x101010, 0.7);
     camera.add(normalAmbient);
 
-    // 2. SHADOW LIGHT: invisible, follows camera
     const shadowLight = new THREE.SpotLight(0xffffff, 1.5, 30, Math.PI / 6, 0.8, 2);
     shadowLight.position.set(0, 2, 3);
     shadowLight.target.position.set(0, 0, -1);
@@ -237,22 +250,15 @@
     shadowLight.shadow.mapSize.width = 1024;
     shadowLight.shadow.mapSize.height = 1024;
     shadowLight.shadow.bias = -0.0001;
-    shadowLight.visible = true;
-
     camera.add(shadowLight);
     camera.add(shadowLight.target);
-
-    let shadowLightEnabled = true;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.xr.enabled = true;
-
-    // Shadow settings
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
     document.body.appendChild(renderer.domElement);
 
     const arButton = ARButton.createButton(renderer, {
@@ -260,7 +266,8 @@
       optionalFeatures: ['dom-overlay'],
       domOverlay: { root: document.body }
     });
-
+    
+    // Style AR Button
     arButton.style.position = 'static';
     arButton.style.width = '100%';
     arButton.style.padding = '14px';
@@ -284,7 +291,6 @@
       arUi.style.display = 'none';
       isPlaced = false;
       solarSystem.visible = false;
-      detectionSoundPlayed = false;
     });
 
     const solarSystem = new THREE.Group();
@@ -293,13 +299,46 @@
 
     const SCALE = 0.015;
     const orbitPathMeshes = [];
-    let pathsVisible = false;
+    const labelMeshes = [];
+
+    // Helper: Create Text Label Sprite
+    function createTextLabel(text) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.fillRect(0, 0, 256, 64);
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(0, 0, 256, 64);
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 30px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 128, 32);
+
+      const texture = new THREE.Texture(canvas);
+      texture.needsUpdate = true;
+      const material = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+      const sprite = new THREE.Sprite(material);
+      sprite.scale.set(0.12, 0.03, 1);
+      sprite.renderOrder = 999; 
+      return sprite;
+    }
 
     const sunTexture = new THREE.TextureLoader().load("textures/sun.jpg");
     const sun = new THREE.Mesh(
       new THREE.SphereGeometry(8 * SCALE, 32, 32),
       new THREE.MeshBasicMaterial({ map: sunTexture })
     );
+    const sunLabel = createTextLabel("Sun");
+    sunLabel.position.y = (8 * SCALE) + 0.05;
+    sun.add(sunLabel);
+    labelMeshes.push(sunLabel);
+    
     sun.castShadow = true;
     sun.receiveShadow = true;
     solarSystem.add(sun);
@@ -308,10 +347,10 @@
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 1024;
     sunLight.shadow.mapSize.height = 1024;
-    sunLight.position.set(0, 0, 0);
     sun.add(sunLight);
 
-    function createPlanet(name, size, distance, speed, texturePath, cloudPath, moonTexture, ringTexture) {
+    // Upgraded createPlanet function handling Inclinations and Realistic Distances
+    function createPlanet(name, size, eduDist, realDist, speed, inclination, texturePath, cloudPath, moonTexture, ringTexture) {
       const texture = new THREE.TextureLoader().load(texturePath);
       const mesh = new THREE.Mesh(
         new THREE.SphereGeometry(size * SCALE, 32, 32),
@@ -321,103 +360,119 @@
       mesh.castShadow = true;
       mesh.receiveShadow = true;
 
-      const pivot = new THREE.Object3D();
-      mesh.position.x = distance * SCALE;
-      pivot.add(mesh);
-      solarSystem.add(pivot);
+      // Group for holding the angled path (Inclination)
+      const inclinationGroup = new THREE.Object3D();
+      // Tilt the orbit
+      inclinationGroup.rotation.x = THREE.MathUtils.degToRad(inclination); 
+      solarSystem.add(inclinationGroup);
 
+      // Pivot rotates the planet around the sun
+      const pivot = new THREE.Object3D();
+      mesh.position.x = eduDist * SCALE;
+      pivot.add(mesh);
+      inclinationGroup.add(pivot);
+
+      // Add Name Label
+      const label = createTextLabel(name);
+      label.position.y = (size * SCALE) + 0.04;
+      mesh.add(label);
+      labelMeshes.push(label);
+
+      // Clouds / Moons / Rings
       if (cloudPath) {
         const cloudTex = new THREE.TextureLoader().load(cloudPath);
         const cloudMesh = new THREE.Mesh(
           new THREE.SphereGeometry((size + 0.05) * SCALE, 32, 32),
-          new THREE.MeshStandardMaterial({
-            map: cloudTex,
-            transparent: true,
-            opacity: 0.6
-          })
+          new THREE.MeshStandardMaterial({ map: cloudTex, transparent: true, opacity: 0.6 })
         );
-        cloudMesh.castShadow = true;
-        cloudMesh.receiveShadow = true;
         mesh.add(cloudMesh);
       }
-
       if (moonTexture) {
         const moonTex = new THREE.TextureLoader().load(moonTexture);
         const moonMesh = new THREE.Mesh(
           new THREE.SphereGeometry(0.8 * SCALE, 16, 16),
           new THREE.MeshStandardMaterial({ map: moonTex })
         );
-        moonMesh.castShadow = true;
-        moonMesh.receiveShadow = true;
-
         const moonPivot = new THREE.Object3D();
         moonMesh.position.x = (size + 2) * SCALE;
         moonPivot.add(moonMesh);
         mesh.add(moonPivot);
       }
-
       if (ringTexture) {
         const ringTex = new THREE.TextureLoader().load(ringTexture);
         const ring = new THREE.Mesh(
           new THREE.RingGeometry((size + 1) * SCALE, (size + 3) * SCALE, 32),
-          new THREE.MeshBasicMaterial({
-            map: ringTex,
-            side: THREE.DoubleSide,
-            transparent: true
-          })
+          new THREE.MeshBasicMaterial({ map: ringTex, side: THREE.DoubleSide, transparent: true })
         );
         ring.rotation.x = Math.PI / 2;
-        ring.receiveShadow = true;
         mesh.add(ring);
       }
 
+      // Orbit Path Ring (Added to inclinationGroup so it tilts perfectly)
       const orbitPath = new THREE.Mesh(
-        new THREE.RingGeometry((distance * SCALE) - 0.002, (distance * SCALE) + 0.002, 64),
-        new THREE.MeshBasicMaterial({
-          color: 0x4facfe,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.4
-        })
+        new THREE.RingGeometry((eduDist * SCALE) - 0.002, (eduDist * SCALE) + 0.002, 64),
+        new THREE.MeshBasicMaterial({ color: 0x4facfe, side: THREE.DoubleSide, transparent: true, opacity: 0.4 })
       );
       orbitPath.rotation.x = Math.PI / 2;
-      orbitPath.visible = false;
-      solarSystem.add(orbitPath);
+      orbitPath.visible = pathsVisible;
+      inclinationGroup.add(orbitPath);
       orbitPathMeshes.push(orbitPath);
 
-      return { mesh, pivot, speed };
+      return { mesh, pivot, speed, baseDist: eduDist, realDist: realDist, pathMesh: orbitPath };
     }
 
+    // Parameters: Name, Size, EduDistance, RealDistance, Speed, Orbit Inclination (Degrees), Textures...
     const planets = [
-      createPlanet("Mercury", 1.5, 12, 0.01, "textures/mercury.jpg"),
-      createPlanet("Venus", 2, 18, 0.007, "textures/venus.jpg"),
-      createPlanet("Earth", 2.5, 24, 0.005, "textures/earth.jpg", "textures/earth_clouds.jpg", "textures/moon.jpg"),
-      createPlanet("Mars", 2, 30, 0.004, "textures/mars.jpg"),
-      createPlanet("Jupiter", 4, 38, 0.003, "textures/jupiter.jpg"),
-      createPlanet("Saturn", 3.5, 46, 0.002, "textures/saturn.jpg", null, null, "textures/saturn_ring.png"),
-      createPlanet("Uranus", 3, 52, 0.0015, "textures/uranus.jpg"),
-      createPlanet("Neptune", 3, 60, 0.001, "textures/neptune.jpg")
+      createPlanet("Mercury", 1.5, 12, 10, 0.01, 7.0, "textures/mercury.jpg"),
+      createPlanet("Venus", 2, 18, 19, 0.007, 3.4, "textures/venus.jpg"),
+      createPlanet("Earth", 2.5, 24, 26, 0.005, 0.0, "textures/earth.jpg", "textures/earth_clouds.jpg", "textures/moon.jpg"),
+      createPlanet("Mars", 2, 30, 39, 0.004, 1.8, "textures/mars.jpg"),
+      createPlanet("Jupiter", 4, 38, 135, 0.003, 1.3, "textures/jupiter.jpg"),
+      createPlanet("Saturn", 3.5, 46, 248, 0.002, 2.5, "textures/saturn.jpg", null, null, "textures/saturn_ring.png"),
+      createPlanet("Uranus", 3, 52, 498, 0.0015, 0.8, "textures/uranus.jpg"),
+      createPlanet("Neptune", 3, 60, 780, 0.001, 1.8, "textures/neptune.jpg"),
+      // Added Comet to demonstrate angled paths clearly
+      createPlanet("Halley's Comet", 0.6, 20, 60, 0.015, 18.0, "textures/moon.jpg") 
     ];
 
-    function playSwitchSound() {
-      switchSound.currentTime = 0;
-      switchSound.play().catch(() => {
-        // Ignore autoplay restrictions
-      });
-    }
-
+    // Button Listeners
     btnToggleLight.addEventListener('click', () => {
       shadowLightEnabled = !shadowLightEnabled;
       shadowLight.visible = shadowLightEnabled;
-
       btnToggleLight.textContent = shadowLightEnabled ? "💡 Light ON" : "💡 Light OFF";
       playSwitchSound();
     });
 
     btnTogglePaths.addEventListener('click', () => {
       pathsVisible = !pathsVisible;
-      btnTogglePaths.innerText = pathsVisible ? "⭕ Hide Paths" : "⭕ Show Paths";
+      btnTogglePaths.innerText = pathsVisible ? "⭕ Paths ON" : "⭕ Paths OFF";
       orbitPathMeshes.forEach(path => path.visible = pathsVisible);
+      playSwitchSound();
+    });
+
+    btnToggleLabels.addEventListener('click', () => {
+      labelsVisible = !labelsVisible;
+      btnToggleLabels.innerText = labelsVisible ? "🏷️ Labels ON" : "🏷️ Labels OFF";
+      labelMeshes.forEach(lbl => lbl.visible = labelsVisible);
+      playSwitchSound();
+    });
+
+    // Handle switching between Educational (linear) and Realistic Distances
+    btnToggleRealism.addEventListener('click', () => {
+      isRealisticMode = !isRealisticMode;
+      btnToggleRealism.innerText = isRealisticMode ? "🔭 Real Orbits ON" : "🔭 Real Orbits OFF";
+      
+      planets.forEach(p => {
+        const targetDist = isRealisticMode ? p.realDist : p.baseDist;
+        
+        // Push planet further out
+        p.mesh.position.x = targetDist * SCALE;
+        
+        // Scale the orbit line to match the new distance
+        const scaleRatio = targetDist / p.baseDist;
+        p.pathMesh.scale.set(scaleRatio, scaleRatio, 1);
+      });
+      playSwitchSound();
     });
 
     let hitTestSource = null;
@@ -432,15 +487,6 @@
     reticle.visible = false;
     scene.add(reticle);
 
-    const playDetectionSound = () => {
-      if (detectionSoundPlayed) return;
-      detectionSound.currentTime = 0;
-      detectionSound.play().catch(() => {
-        // Ignore autoplay restrictions
-      });
-      detectionSoundPlayed = true;
-    };
-
     const controller = renderer.xr.getController(0);
     controller.addEventListener('select', () => {
       if (reticle.visible && !isPlaced) {
@@ -450,9 +496,7 @@
         reticle.visible = false;
 
         statusText.innerText = "System anchored! Planets orbiting.";
-        setTimeout(() => {
-          statusText.style.display = 'none';
-        }, 3500);
+        setTimeout(() => { statusText.style.display = 'none'; }, 3500);
       }
     });
     scene.add(controller);
@@ -464,9 +508,7 @@
 
         if (!hitTestSourceRequested) {
           session.requestReferenceSpace('viewer').then((refSpace) => {
-            session.requestHitTestSource({ space: refSpace }).then((source) => {
-              hitTestSource = source;
-            });
+            session.requestHitTestSource({ space: refSpace }).then((source) => { hitTestSource = source; });
           });
           hitTestSourceRequested = true;
         }
@@ -478,11 +520,14 @@
             const hit = hitTestResults[0];
             reticle.visible = true;
             reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
-
             statusText.style.display = 'block';
             statusText.innerText = "Surface detected! Tap screen to place.";
-
-            playDetectionSound();
+            
+            if (!detectionSoundPlayed) {
+              detectionSound.currentTime = 0;
+              detectionSound.play().catch(() => {});
+              detectionSoundPlayed = true;
+            }
           } else {
             reticle.visible = false;
             detectionSoundPlayed = false;
@@ -494,17 +539,24 @@
 
       if (isPlaced) {
         const currentSpeed = speedSlider ? parseFloat(speedSlider.value) : 1;
+        
+        // Spin planets on their axis and pivot them around the sun
+        sun.rotation.y += 0.002 * currentSpeed;
         planets.forEach(p => {
           p.pivot.rotation.y += p.speed * currentSpeed;
-          p.mesh.rotation.y += 0.005;
+          p.mesh.rotation.y += 0.005; 
         });
       }
 
-      // Shadow light follows the AR camera position.
-      // Because it is a child of the camera, its local transform is enough.
+      // Rotate labels to always face the camera so they remain readable
+      if (labelsVisible) {
+        labelMeshes.forEach(lbl => {
+          lbl.quaternion.copy(camera.quaternion);
+        });
+      }
+
       shadowLight.position.set(0, 2, 3);
       shadowLight.target.position.set(0, 0, -1);
-
       renderer.render(scene, camera);
     });
 
