@@ -4,39 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Solar Explorer</title>
-    <!-- Link to our stylesheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        
-        <header class="header">
-            <h1>AR Solar Explorer</h1>
-            <p>Explore the Solar System in Augmented Reality</p>
-        </header>
+    <div class="site-shell">
+        <nav class="navbar">
+            <a href="index.html" class="brand">
+                <span class="brand-symbol"><span></span></span>
+                <span>AR <strong>Solar</strong> Explorer</span>
+            </a>
 
-        <main class="menu-cards">
-            <!-- Marker AR Option -->
-            <div class="card">
-                <h2>Marker AR</h2>
-                <p>Use your camera to scan the Solar System image target and watch the planets orbit.</p>
-                <!-- This link connects directly to the AR file we built earlier -->
-                <a href="marker-ar.html" class="btn primary-btn">Start Marker AR</a>
+            <div class="live-status">
+                <span></span>
+                Mission system online
             </div>
+        </nav>
 
-            <!-- Markerless AR Option -->
-            <div class="card">
-                <h2>Markerless AR</h2>
-                <p>Detect a flat surface like a table or floor and place the Solar System in your room.</p>
-                <!-- This will link to the markerless file we build next -->
-                <a href="markerless-ar.html" class="btn secondary-btn">Start Markerless AR</a>
-            </div>
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <p class="eyebrow">Explore beyond the screen</p>
+
+                    <h1>
+                        Discover the
+                        <em>universe.</em>
+                    </h1>
+
+                    <p class="hero-description">
+                        Step into an interactive journey through our solar system.
+                        Place planets in your world or scan a mission marker to begin.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="markerless-ar.html" class="primary-button">
+                            Start exploring <span>→</span>
+                        </a>
+
+                        <a href="marker-ar.html" class="secondary-link">
+                            Use image marker
+                        </a>
+                    </div>
+                </div>
+
+                <div class="solar-visual" aria-label="Animated solar system illustration">
+                    <div class="visual-caption caption-top">Solar system / 01</div>
+
+                    <div class="orbit orbit-large"></div>
+                    <div class="orbit orbit-medium"></div>
+                    <div class="orbit orbit-small"></div>
+
+                    <div class="sun">
+                        <span></span>
+                    </div>
+
+                    <div class="planet planet-one"></div>
+                    <div class="planet planet-two"></div>
+                    <div class="planet planet-three">
+                        <span></span>
+                    </div>
+
+                    <div class="visual-caption caption-bottom">
+                        Interactive planetary motion
+                    </div>
+                </div>
+            </section>
+
+            <section class="explore-section">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">Choose your experience</p>
+                        <h2>Where will you begin?</h2>
+                    </div>
+
+                    <p class="section-description">
+                        Two portals. One unforgettable journey.
+                    </p>
+                </div>
+
+                <div class="experience-grid">
+                    <a href="markerless-ar.html" class="experience-card light-card">
+                        <div class="card-top">
+                            <span>Recommended</span>
+                            <span>01</span>
+                        </div>
+
+                        <div class="experience-icon surface-icon">
+                            <span></span>
+                        </div>
+
+                        <h3>Place it in your world</h3>
+
+                        <p>
+                            Detect a table or floor and bring the complete solar
+                            system into your real surroundings.
+                        </p>
+
+                        <strong>
+                            Launch markerless AR <span>↗</span>
+                        </strong>
+                    </a>
+
+                    <a href="marker-ar.html" class="experience-card dark-card">
+                        <div class="card-top">
+                            <span>Precision mode</span>
+                            <span>02</span>
+                        </div>
+
+                        <div class="experience-icon marker-icon">
+                            <span></span>
+                        </div>
+
+                        <h3>Scan a mission marker</h3>
+
+                        <p>
+                            Scan the target image to reveal a stable and guided
+                            augmented reality solar system.
+                        </p>
+
+                        <strong>
+                            Launch marker AR <span>↗</span>
+                        </strong>
+                    </a>
+                </div>
+            </section>
         </main>
 
-        <footer class="footer">
-            <p>INTE 42312 – Virtual and Augmented Reality</p>
+        <footer class="site-footer">
+            <span>AR Solar Explorer</span>
+            <span>Explore beyond the screen</span>
+            <span>Mission ready</span>
         </footer>
-        
     </div>
 </body>
 </html>
