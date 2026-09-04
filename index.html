@@ -3,40 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Solar Explorer</title>
-    <!-- Link to our stylesheet -->
+    <title>AR Solar Explorer | Interactive Universe</title>
+    
+    <!-- Modern web typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        
-        <header class="header">
-            <h1>AR Solar Explorer</h1>
-            <p>Explore the Solar System in Augmented Reality</p>
+    
+    <!-- Minimalist Navigation -->
+    <nav class="navbar">
+        <div class="logo">✦ SolarExplorer AR</div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <!-- Hero Section -->
+        <header class="hero">
+            <span class="tech-badge">Powered by WebXR</span>
+            <h1>Bring the <span class="text-glow">Universe</span><br>to Your Room</h1>
+            <p>Experience the Solar System in stunning augmented reality. No apps to download—just immersive, interactive spatial computing directly in your browser.</p>
         </header>
 
-        <main class="menu-cards">
-            <!-- Marker AR Option -->
-            <div class="card">
-                <h2>Marker AR</h2>
-                <p>Use your camera to scan the Solar System image target and watch the planets orbit.</p>
-                <!-- This link connects directly to the AR file we built earlier -->
-                <a href="marker-ar.html" class="btn primary-btn">Start Marker AR</a>
+        <!-- Interactive AR Mode Selection -->
+        <main class="ar-modes-grid">
+            
+            <!-- Marker AR Card -->
+            <div class="mode-card glass-panel">
+                <div class="card-icon">🎯</div>
+                <h2>Target Tracking</h2>
+                <p>Use your camera to scan our dedicated Solar System marker. Watch the planets anchor and orbit in real-time over your physical document.</p>
+                <a href="marker-ar.html" class="btn btn-primary">
+                    Launch Marker Mode <span class="arrow">→</span>
+                </a>
             </div>
 
-            <!-- Markerless AR Option -->
-            <div class="card">
-                <h2>Markerless AR</h2>
-                <p>Detect a flat surface like a table or floor and place the Solar System in your room.</p>
-                <!-- This will link to the markerless file we build next -->
-                <a href="markerless-ar.html" class="btn secondary-btn">Start Markerless AR</a>
+            <!-- Markerless AR Card -->
+            <div class="mode-card glass-panel">
+                <div class="card-icon">🌌</div>
+                <div class="badge-new">Immersive</div>
+                <h2>Spatial Placement</h2>
+                <p>Detect a flat surface like your table or floor. Drop a massive, interactive 3D model of the Solar System right into your physical environment.</p>
+                <a href="markerless-ar.html" class="btn btn-outline">
+                    Launch Spatial Mode <span class="arrow">→</span>
+                </a>
             </div>
+
         </main>
-
-        <footer class="footer">
-            <p>INTE 42312 – Virtual and Augmented Reality</p>
-        </footer>
-        
     </div>
+
+    <footer class="main-footer">
+        <p>Engineered for the modern web. &copy; 2026 AR Solar Explorer.</p>
+    </footer>
+
 </body>
 </html>
