@@ -100,7 +100,7 @@ body {
 /* ========================================================
    GLASSMORPHISM UTILITY (Used for Cards & Lists)
    ======================================================== */
-.glass-panel, .step, .credits-list {
+.glass-panel {
     background: var(--bg-panel);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -265,7 +265,6 @@ body {
     text-decoration: underline;
 }
 
-/* Mobile responsive fix for credits */
 @media (max-width: 600px) {
     .credit-item {
         flex-direction: column;
