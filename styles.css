@@ -228,3 +228,406 @@ body {
 }
 
 .hidden { display: none !important; }
+
+/* ========================================================
+   DASHBOARD + CREDITS (scoped — does not affect AR scenes)
+   ======================================================== */
+body.dashboard,
+body.dashboard * {
+    font-family: 'Outfit', 'Segoe UI', sans-serif;
+}
+
+body.dashboard h1,
+body.dashboard h2,
+body.dashboard h3 {
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+}
+
+body.dashboard {
+    position: relative;
+    display: block;
+    background:
+        radial-gradient(1200px 700px at 12% -10%, rgba(79, 172, 254, 0.18), transparent 55%),
+        radial-gradient(900px 600px at 110% 10%, rgba(255, 179, 71, 0.12), transparent 50%),
+        radial-gradient(800px 500px at 50% 120%, rgba(0, 242, 254, 0.08), transparent 45%),
+        #05070f;
+    color: #f7fafc;
+    text-align: left;
+    overflow-x: hidden;
+}
+
+body.dashboard .space-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body.dashboard .stars {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 22% 38%, rgba(255,255,255,0.55), transparent),
+        radial-gradient(1.5px 1.5px at 41% 18%, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 63% 8%, rgba(255,255,255,0.45), transparent),
+        radial-gradient(1px 1px at 78% 32%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1.5px 1.5px at 91% 16%, rgba(255,255,255,0.55), transparent),
+        radial-gradient(1px 1px at 14% 72%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 33% 88%, rgba(255,255,255,0.75), transparent),
+        radial-gradient(1.5px 1.5px at 57% 64%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 72% 81%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 86% 58%, rgba(255,255,255,0.85), transparent),
+        radial-gradient(1px 1px at 95% 92%, rgba(255,255,255,0.5), transparent);
+    animation: twinkle 8s ease-in-out infinite;
+}
+
+body.dashboard .nebula {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    right: -120px;
+    top: -80px;
+    background: radial-gradient(circle, rgba(79, 172, 254, 0.22) 0%, rgba(0, 242, 254, 0.04) 45%, transparent 70%);
+    filter: blur(12px);
+}
+
+body.dashboard .orbit-ring {
+    position: absolute;
+    width: min(70vw, 640px);
+    height: min(70vw, 640px);
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(79, 172, 254, 0.12);
+    border-radius: 50%;
+    box-shadow: 0 0 0 18px rgba(79, 172, 254, 0.04);
+}
+
+body.dashboard .dashboard-container {
+    position: relative;
+    z-index: 1;
+    width: min(920px, calc(100% - 32px));
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 0 48px;
+    gap: 36px;
+    min-height: 100vh;
+    justify-content: center;
+}
+
+body.dashboard .dash-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+body.dashboard .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.35), rgba(0, 242, 254, 0.12));
+    border: 1px solid rgba(79, 172, 254, 0.45);
+    color: #e6fbff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: 0 8px 24px rgba(79, 172, 254, 0.18);
+}
+
+body.dashboard .nav-link {
+    color: #c5d4e8;
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+body.dashboard .nav-link:hover,
+body.dashboard .nav-link:focus-visible {
+    color: #ffffff;
+    border-color: rgba(79, 172, 254, 0.6);
+    background: rgba(79, 172, 254, 0.15);
+    outline: none;
+}
+
+body.dashboard .header {
+    text-align: left;
+    max-width: 640px;
+}
+
+body.dashboard .eyebrow {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(255, 179, 71, 0.12);
+    border: 1px solid rgba(255, 179, 71, 0.28);
+    color: #ffd59a;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+body.dashboard .header h1 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    line-height: 1.05;
+    margin-bottom: 12px;
+    background: linear-gradient(120deg, #ffffff 10%, #4facfe 55%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.03em;
+}
+
+body.dashboard .header p {
+    color: #a8b8cc;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+body.dashboard .menu-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+body.dashboard .card {
+    background: linear-gradient(180deg, rgba(22, 30, 48, 0.82) 0%, rgba(12, 16, 28, 0.9) 100%);
+    border: 1px solid rgba(79, 172, 254, 0.22);
+    border-radius: 20px;
+    padding: 28px 24px 24px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(16px);
+    text-align: left;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.dashboard .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 242, 254, 0.45);
+    box-shadow: 0 22px 48px rgba(79, 172, 254, 0.16);
+}
+
+body.dashboard .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+body.dashboard .card-icon {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(79, 172, 254, 0.12);
+    border: 1px solid rgba(79, 172, 254, 0.28);
+    color: #7dd3fc;
+    font-size: 1.25rem;
+}
+
+body.dashboard .card-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9ec9ff;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(79, 172, 254, 0.1);
+}
+
+body.dashboard .card h2 {
+    font-size: 1.55rem;
+    margin-bottom: 10px;
+    color: #f8fafc;
+    letter-spacing: -0.02em;
+}
+
+body.dashboard .card p {
+    color: #a0b0c4;
+    font-size: 0.98rem;
+    margin-bottom: 22px;
+    line-height: 1.6;
+}
+
+body.dashboard .btn {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+}
+
+body.dashboard .primary-btn {
+    background: linear-gradient(135deg, #4facfe 0%, #3182ce 100%);
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(49, 130, 206, 0.35);
+}
+
+body.dashboard .primary-btn:hover {
+    background: linear-gradient(135deg, #63b3ed 0%, #2b6cb0 100%);
+}
+
+body.dashboard .secondary-btn {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+body.dashboard .secondary-btn:hover {
+    background: rgba(79, 172, 254, 0.18);
+    border-color: rgba(79, 172, 254, 0.45);
+}
+
+body.dashboard .footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: #6b7c93;
+}
+
+body.dashboard .footer a {
+    color: #8ec5ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+body.dashboard .footer a:hover,
+body.dashboard .footer a:focus-visible {
+    color: #c5e4ff;
+    text-decoration: underline;
+}
+
+body.dashboard .credits-container {
+    max-width: 920px;
+}
+
+body.dashboard .credits-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+body.dashboard .credits-section h2 {
+    font-size: 1.2rem;
+    color: #e2e8f0;
+    letter-spacing: -0.02em;
+}
+
+body.dashboard .section-lead {
+    color: #93a4bb;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+body.dashboard .section-lead a,
+body.dashboard .credit-link {
+    color: #7dd3fc;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+body.dashboard .section-lead a:hover,
+body.dashboard .credit-link:hover {
+    text-decoration: underline;
+}
+
+body.dashboard .credit-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+body.dashboard .credit-card {
+    background: linear-gradient(180deg, rgba(22, 30, 48, 0.82) 0%, rgba(12, 16, 28, 0.9) 100%);
+    border: 1px solid rgba(79, 172, 254, 0.22);
+    border-radius: 18px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    backdrop-filter: blur(16px);
+}
+
+body.dashboard .credit-glyph {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+}
+
+body.dashboard .credit-card h3 {
+    font-size: 1.2rem;
+    color: #f8fafc;
+}
+
+body.dashboard .credit-artist {
+    color: #4facfe;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+body.dashboard .credit-note {
+    color: #93a4bb;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+body.dashboard .credit-link.subtle {
+    color: #a0b0c4;
+    font-size: 0.85rem;
+}
+
+body.dashboard code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.86em;
+    color: #c5e4ff;
+    background: rgba(79, 172, 254, 0.12);
+    padding: 1px 6px;
+    border-radius: 6px;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+@media (min-width: 760px) {
+    body.dashboard .menu-cards,
+    body.dashboard .credit-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    body.dashboard .credit-card-wide {
+        grid-column: 1 / -1;
+    }
+
+    body.dashboard .footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+@media (min-width: 760px) {
+    body.dashboard.credits-page .credit-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
