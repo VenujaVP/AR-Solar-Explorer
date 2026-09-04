@@ -1,132 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Solar Explorer</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="logo">✦ SolarExplorer AR</div>
-    </nav>
 
-    <div class="dashboard-wrapper">
-        <header class="hero">
-            <span class="tech-badge">Powered by WebXR</span>
-            <h1>Bring the <span class="text-glow">Universe</span><br>to Your Room</h1>
-            <p>
-                Experience the Solar System in augmented reality.
-                Choose a mode below to begin.
-            </p>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AR Solar Explorer</title>
+
+    <!-- Link to our stylesheet -->
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+       
+
+        <header class="header">
+
+            <h1>AR Solar Explorer</h1>
+
+            <p>Explore the Solar System in Augmented Reality</p>
+
         </header>
 
-        <main>
-            <section class="ar-modes-grid" aria-label="AR modes">
-                <article class="mode-card glass-panel">
-                    <div class="card-icon">🎯</div>
-                    <h2>Target Tracking</h2>
-                    <p>
-                        Scan the Solar System marker with your camera.
-                        The planets will appear anchored to the printed target.
-                    </p>
-                    <a href="marker-ar.html" class="btn btn-primary">
-                        Launch Marker Mode <span class="arrow">→</span>
-                    </a>
-                </article>
 
-                <article class="mode-card glass-panel">
-                    <div class="card-icon">🌌</div>
-                    <div class="badge-new">Immersive</div>
-                    <h2>Spatial Placement</h2>
-                    <p>
-                        Detect a flat surface such as a table or floor,
-                        then place the interactive Solar System in your room.
-                    </p>
-                    <a href="markerless-ar.html" class="btn btn-outline">
-                        Launch Spatial Mode <span class="arrow">→</span>
-                    </a>
-                </article>
-            </section>
 
-            <section class="info-section">
-                <span class="section-label">Quick guide</span>
-                <h2>How It Works</h2>
+        <main class="menu-cards">
 
-                <div class="steps-grid">
-                    <article class="step">
-                        <span class="step-number">01</span>
-                        <h3>Choose a mode</h3>
-                        <p>
-                            Use Target Tracking with a printed marker,
-                            or Spatial Placement with a flat physical surface.
-                        </p>
-                    </article>
+            <!-- Marker AR Option -->
 
-                    <article class="step">
-                        <span class="step-number">02</span>
-                        <h3>Allow camera access</h3>
-                        <p>
-                            Your browser uses the camera to understand the
-                            marker or detect a suitable surface.
-                        </p>
-                    </article>
+            <div class="card">
 
-                    <article class="step">
-                        <span class="step-number">03</span>
-                        <h3>Explore the planets</h3>
-                        <p>
-                            Rotate, zoom, pause orbits, show paths,
-                            and focus on the Sun, Earth, or Moon.
-                        </p>
-                    </article>
-                </div>
-            </section>
+                <h2>Marker AR</h2>
 
-            <section class="credits-section">
-                <span class="section-label">Credits</span>
-                <h2>Assets and Tools</h2>
+                <p>Use your camera to scan the Solar System image target and watch the planets orbit.</p>
 
-                <div class="credits-list">
-                    <div class="credit-item">
-                        <strong>AR marker creation</strong>
-                        <span>
-                            <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile/" target="_blank" rel="noopener noreferrer">
-                                MindAR Image Target Compiler
-                            </a>
-                        </span>
-                    </div>
+                <!-- This link connects directly to the AR file we built earlier -->
 
-                    <div class="credit-item">
-                        <strong>3D model platform</strong>
-                        <span>
-                            <a href="https://sketchfab.com/" target="_blank" rel="noopener noreferrer">
-                                Sketchfab
-                            </a>
-                        </span>
-                    </div>
+                <a href="marker-ar.html" class="btn primary-btn">Start Marker AR</a>
 
-                    <div class="credit-item">
-                        <strong>Sun model</strong>
-                        <span>Chaitanya Krishnan via Sketchfab</span>
-                    </div>
+            </div>
 
-                    <div class="credit-item">
-                        <strong>Moon model</strong>
-                        <span>JanesBT via Sketchfab</span>
-                    </div>
 
-                    <div class="credit-item">
-                        <strong>Earth model</strong>
-                        <span>3DGB via Sketchfab</span>
-                    </div>
-                </div>
-            </section>
+
+            <!-- Markerless AR Option -->
+
+            <div class="card">
+
+                <h2>Markerless AR</h2>
+
+                <p>Detect a flat surface like a table or floor and place the Solar System in your room.</p>
+
+                <!-- This will link to the markerless file we build next -->
+
+                <a href="markerless-ar.html" class="btn secondary-btn">Start Markerless AR</a>
+
+            </div>
+
         </main>
+
+
+
+        <footer class="footer">
+
+            <p>INTE 42312 – Virtual and Augmented Reality</p>
+
+        </footer>
+
+       
+
     </div>
 
-    <footer class="main-footer">
-        <p>INTE 42312 – Virtual and Augmented Reality</p>
-    </footer>
 </body>
+
 </html>
