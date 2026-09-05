@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="interactions.js" defer></script>
     
-    <style> body { margin: 0; overflow: hidden; touch-action: none; } </style>
+    <style> body { margin: 0; overflow: hidden; touch-action: none; user-select: none; } </style>
   </head>
 
   <body>
@@ -19,11 +19,21 @@
          THE AR UI OVERLAY
          ================================================================ -->
     <div id="ar-ui-container" class="hidden">
-      
+      <div id="gesture-layer" aria-hidden="true"></div>
+
       <div id="top-controls">
         <button id="btn-play-pause" class="glass-btn">⏸ Pause Orbits</button>
         <button id="btn-toggle-orbits" class="glass-btn">⭕ Show Paths</button>
         <button id="btn-toggle-bg" class="glass-btn">🌌 Background: OFF</button>
+      </div>
+
+      <p id="gesture-hint">Drag to rotate · Scroll to zoom</p>
+
+      <div id="transform-dock" aria-label="Zoom and rotate">
+        <button id="btn-rotate-left" class="xform-btn" type="button" title="Rotate left" aria-label="Rotate left">↺</button>
+        <button id="btn-zoom-in" class="xform-btn" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+        <button id="btn-zoom-out" class="xform-btn" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+        <button id="btn-rotate-right" class="xform-btn" type="button" title="Rotate right" aria-label="Rotate right">↻</button>
       </div>
 
       <div id="planet-selector">

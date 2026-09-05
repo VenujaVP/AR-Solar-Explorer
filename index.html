@@ -29,23 +29,39 @@
         </header>
 
         <main class="menu-cards">
-            <article class="card">
-                <div class="card-top">
-                    <span class="card-icon" aria-hidden="true">◎</span>
-                    <span class="card-tag">Image target</span>
+            <article class="card card-featured">
+                <div class="marker-copy">
+                    <div class="card-top">
+                        <span class="card-icon" aria-hidden="true">◎</span>
+                        <span class="card-tag">Image target</span>
+                    </div>
+                    <h2>Marker AR</h2>
+                    <p>Print or display the Solar System marker, then point your camera at it to launch the orbiting Sun, Earth, and Moon. Zoom and rotate the scene on desktop or mobile.</p>
+                    <a href="marker-ar.html" class="btn primary-btn">Start Marker AR</a>
                 </div>
-                <h2>Marker AR</h2>
-                <p>Use your camera to scan the Solar System image target and watch the planets orbit.</p>
-                <a href="marker-ar.html" class="btn primary-btn">Start Marker AR</a>
+
+                <div class="marker-showcase">
+                    <button type="button" class="marker-frame" data-open-marker aria-label="View Solar System tracking marker">
+                        <span class="marker-badge">Tracking image</span>
+                        <img src="markers/solar-system.png" alt="Solar System AR marker showing the Sun, Earth, and Moon">
+                    </button>
+                    <p class="marker-caption">Use this image to track the 3D models. Open it on another screen or print it, then scan it in Marker AR.</p>
+                    <div class="marker-actions">
+                        <button type="button" class="ghost-btn" data-open-marker>View marker</button>
+                        <a class="ghost-btn" href="markers/solar-system.png" download="solar-system-marker.png">Download PNG</a>
+                    </div>
+                </div>
             </article>
 
-            <article class="card">
+            <article class="card card-compact">
                 <div class="card-top">
                     <span class="card-icon" aria-hidden="true">⬡</span>
                     <span class="card-tag">Surface tracking</span>
                 </div>
-                <h2>Markerless AR</h2>
-                <p>Detect a flat surface like a table or floor and place the Solar System in your room.</p>
+                <div class="card-copy">
+                    <h2>Markerless AR</h2>
+                    <p>Detect a flat surface like a table or floor and place the Solar System in your room.</p>
+                </div>
                 <a href="markerless-ar.html" class="btn secondary-btn">Start Markerless AR</a>
             </article>
         </main>
@@ -55,5 +71,50 @@
             <a href="credits.html">3D models &amp; image target credits</a>
         </footer>
     </div>
+
+    <div id="marker-lightbox" class="marker-lightbox hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="marker-lightbox-title">
+        <div class="lightbox-backdrop" data-close-marker></div>
+        <div class="lightbox-panel">
+            <button type="button" class="lightbox-close" data-close-marker aria-label="Close marker preview">×</button>
+            <img src="markers/solar-system.png" alt="Full size Solar System AR tracking marker">
+            <div class="lightbox-copy">
+                <div>
+                    <h3 id="marker-lightbox-title">Solar System marker</h3>
+                    <p>Print this image or open it on a second screen, then scan it to place the models.</p>
+                </div>
+                <a class="ghost-btn" href="markers/solar-system.png" download="solar-system-marker.png">Download PNG</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const lightbox = document.getElementById("marker-lightbox");
+            if (!lightbox) return;
+
+            const openers = document.querySelectorAll("[data-open-marker]");
+            const closers = lightbox.querySelectorAll("[data-close-marker]");
+
+            function openLightbox() {
+                lightbox.classList.remove("hidden");
+                lightbox.setAttribute("aria-hidden", "false");
+                document.body.style.overflow = "hidden";
+            }
+
+            function closeLightbox() {
+                lightbox.classList.add("hidden");
+                lightbox.setAttribute("aria-hidden", "true");
+                document.body.style.overflow = "";
+            }
+
+            openers.forEach((el) => el.addEventListener("click", openLightbox));
+            closers.forEach((el) => el.addEventListener("click", closeLightbox));
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && !lightbox.classList.contains("hidden")) {
+                    closeLightbox();
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

@@ -136,10 +136,92 @@ body {
 .glass-btn:active { background: rgba(255, 255, 255, 0.2); }
 
 #top-controls {
+    position: relative;
+    z-index: 3;
     display: flex;
     gap: 8px;
     justify-content: center;
     padding: 15px;
+}
+
+#gesture-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: auto;
+    touch-action: none;
+    cursor: grab;
+}
+
+#gesture-layer.is-dragging {
+    cursor: grabbing;
+}
+
+#gesture-hint {
+    position: absolute;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none;
+    margin: 0;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(10, 15, 30, 0.72);
+    border: 1px solid rgba(79, 172, 254, 0.4);
+    color: #d7ecff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    transition: opacity 0.4s ease;
+}
+
+#gesture-hint.hint-faded {
+    opacity: 0;
+}
+
+#transform-dock {
+    pointer-events: auto;
+    position: absolute;
+    right: 14px;
+    top: 22%;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 18px;
+    background: rgba(10, 15, 30, 0.72);
+    border: 1px solid rgba(79, 172, 254, 0.45);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+.xform-btn {
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.xform-btn:hover {
+    background: rgba(79, 172, 254, 0.28);
+    border-color: #4facfe;
+}
+
+.xform-btn:active {
+    transform: scale(0.94);
+    background: rgba(79, 172, 254, 0.4);
 }
 
 /* Professional Planet Selector Dock */
@@ -149,6 +231,7 @@ body {
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 3;
     display: flex;
     gap: 10px;
     background: rgba(10, 15, 30, 0.7);
@@ -170,6 +253,7 @@ body {
     cursor: pointer;
     transition: all 0.3s;
 }
+.dock-btn:hover,
 .dock-btn:active { background: rgba(79, 172, 254, 0.3); border-color: #4facfe; }
 
 /* Focus Mode Top Buttons (Small Back & Pause) */
@@ -178,6 +262,7 @@ body {
     position: absolute;
     top: 20px;
     width: 100%;
+    z-index: 3;
     display: flex;
     justify-content: space-between;
     padding: 0 20px;
@@ -203,6 +288,7 @@ body {
     left: 0;
     width: 100%;
     height: 40vh; /* Leaves top 60% of screen for the 3D model */
+    z-index: 3;
     background: linear-gradient(180deg, rgba(15, 20, 35, 0.9) 0%, rgba(5, 8, 15, 1) 100%);
     border-top: 1px solid #4facfe;
     border-radius: 25px 25px 0 0;
@@ -630,4 +716,219 @@ body.dashboard code {
     body.dashboard.credits-page .credit-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+
+    body.dashboard .card-featured {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+        gap: 28px;
+        align-items: center;
+    }
+
+    body.dashboard .card-compact {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 18px;
+        padding: 22px 24px;
+    }
+
+    body.dashboard .card-compact .card-copy h2,
+    body.dashboard .card-compact .card-copy p {
+        margin-bottom: 0;
+    }
+
+    body.dashboard .card-compact .card-copy p {
+        margin-top: 6px;
+    }
+
+    body.dashboard .card-compact .card-top {
+        margin-bottom: 0;
+    }
+
+    body.dashboard .card-compact .btn {
+        width: auto;
+        min-width: 220px;
+        padding: 12px 18px;
+    }
+}
+
+body.dashboard .marker-copy .card-top {
+    margin-bottom: 16px;
+}
+
+body.dashboard .marker-copy .btn {
+    margin-top: 6px;
+}
+
+body.dashboard .marker-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+body.dashboard .marker-frame {
+    position: relative;
+    width: 100%;
+    padding: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(79, 172, 254, 0.38);
+    background: #070b14;
+    appearance: none;
+    font: inherit;
+    text-align: left;
+    cursor: zoom-in;
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.38),
+        0 0 48px rgba(79, 172, 254, 0.16);
+}
+
+body.dashboard .marker-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 55%, rgba(5, 8, 16, 0.28) 100%);
+}
+
+body.dashboard .marker-frame img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    cursor: zoom-in;
+    transition: transform 0.45s ease;
+}
+
+body.dashboard .marker-frame:hover img {
+    transform: scale(1.03);
+}
+
+body.dashboard .marker-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(8, 12, 22, 0.72);
+    border: 1px solid rgba(255, 213, 154, 0.35);
+    color: #ffd59a;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.dashboard .marker-caption {
+    color: #93a4bb;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+body.dashboard .marker-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+body.dashboard .ghost-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    color: #e8f4ff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+body.dashboard .ghost-btn:hover,
+body.dashboard .ghost-btn:focus-visible {
+    background: rgba(79, 172, 254, 0.18);
+    border-color: rgba(79, 172, 254, 0.5);
+    outline: none;
+}
+
+body.dashboard .marker-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+}
+
+body.dashboard .lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 6, 14, 0.78);
+    backdrop-filter: blur(14px);
+}
+
+body.dashboard .lightbox-panel {
+    position: relative;
+    width: min(760px, 100%);
+    background: linear-gradient(180deg, rgba(22, 30, 48, 0.96) 0%, rgba(10, 14, 24, 0.98) 100%);
+    border: 1px solid rgba(79, 172, 254, 0.35);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 80px rgba(79, 172, 254, 0.14);
+}
+
+body.dashboard .lightbox-panel img {
+    width: 100%;
+    border-radius: 16px;
+    display: block;
+    background: #05070f;
+}
+
+body.dashboard .lightbox-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(8, 12, 22, 0.8);
+    color: #ffffff;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+body.dashboard .lightbox-copy {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+body.dashboard .lightbox-copy h3 {
+    font-size: 1.15rem;
+    color: #f8fafc;
+}
+
+body.dashboard .lightbox-copy p {
+    color: #93a4bb;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+body.dashboard .lightbox-copy .ghost-btn {
+    min-width: 160px;
 }

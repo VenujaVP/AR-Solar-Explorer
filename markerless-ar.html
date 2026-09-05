@@ -168,6 +168,114 @@
       width: 100%;
       accent-color: #00f2fe;
     }
+
+    #gesture-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      touch-action: none;
+      cursor: grab;
+      visibility: hidden;
+    }
+
+    #ar-ui.is-placed #gesture-layer {
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    #gesture-layer.is-dragging {
+      cursor: grabbing;
+    }
+
+    #ar-status {
+      z-index: 3;
+    }
+
+    #gesture-hint {
+      position: absolute;
+      top: auto;
+      bottom: 98px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      pointer-events: none;
+      margin: 0;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(10, 15, 30, 0.72);
+      border: 1px solid rgba(79, 172, 254, 0.4);
+      color: #d7ecff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease;
+    }
+
+    #ar-ui.is-placed #gesture-hint {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #gesture-hint.hint-faded {
+      opacity: 0;
+    }
+
+    #transform-dock {
+      position: absolute;
+      right: 14px;
+      top: 42%;
+      z-index: 3;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 18px;
+      background: rgba(10, 15, 30, 0.72);
+      border: 1px solid rgba(79, 172, 254, 0.45);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+      pointer-events: auto;
+    }
+
+    #ar-ui.is-placed #transform-dock {
+      display: flex;
+    }
+
+    .xform-btn {
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #ffffff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .xform-btn:hover {
+      background: rgba(79, 172, 254, 0.28);
+      border-color: #4facfe;
+    }
+
+    .xform-btn:active {
+      transform: scale(0.94);
+      background: rgba(79, 172, 254, 0.4);
+    }
+
+    #top-bar,
+    #speed-container {
+      z-index: 3;
+    }
   </style>
 </head>
 
@@ -175,13 +283,15 @@
   <div id="launch-screen">
     <div class="launch-card">
       <h1>Markerless AR</h1>
-      <p>Scan your physical floor or table to detect a surface, then tap to place the interactive Solar System in your room.</p>
+      <p>Scan a floor or table, tap to place the Solar System, then zoom and spin it around the vertical axis.</p>
       <div id="ar-button-slot"></div>
       <a href="index.html" class="back-link">← Back to Dashboard</a>
     </div>
   </div>
 
   <div id="ar-ui">
+    <div id="gesture-layer" aria-hidden="true"></div>
+
     <div id="top-bar">
       <a href="index.html" class="glass-btn">❮ Exit</a>
 
@@ -194,6 +304,14 @@
     </div>
 
     <div id="ar-status">Scanning environment... Point at a flat surface.</div>
+    <p id="gesture-hint">Drag to spin · Pinch or scroll to zoom</p>
+
+    <div id="transform-dock" aria-label="Zoom and rotate">
+      <button id="btn-rotate-left" class="xform-btn" type="button" title="Rotate left" aria-label="Rotate left">↺</button>
+      <button id="btn-zoom-in" class="xform-btn" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+      <button id="btn-zoom-out" class="xform-btn" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+      <button id="btn-rotate-right" class="xform-btn" type="button" title="Rotate right" aria-label="Rotate right">↻</button>
+    </div>
 
     <div id="speed-container">
       <label>Orbit Speed</label>
@@ -214,6 +332,8 @@
     const btnToggleLabels = document.getElementById('btn-toggle-labels');
     const btnToggleRealism = document.getElementById('btn-toggle-realism');
     const arButtonSlot = document.getElementById('ar-button-slot');
+    const gestureLayer = document.getElementById('gesture-layer');
+    const gestureHint = document.getElementById('gesture-hint');
 
     // UI States
     let shadowLightEnabled = true;
@@ -289,8 +409,10 @@
     renderer.xr.addEventListener('sessionend', () => {
       launchScreen.style.display = 'flex';
       arUi.style.display = 'none';
+      arUi.classList.remove('is-placed');
       isPlaced = false;
       solarSystem.visible = false;
+      resetUserTransform();
     });
 
     const solarSystem = new THREE.Group();
@@ -494,12 +616,161 @@
         solarSystem.visible = true;
         isPlaced = true;
         reticle.visible = false;
+        arUi.classList.add('is-placed');
+        resetUserTransform();
+        refreshHint();
+        window.setTimeout(hideHint, 4500);
 
-        statusText.innerText = "System anchored! Planets orbiting.";
+        statusText.innerText = "Anchored! Drag to spin, pinch or use + / − to zoom.";
         setTimeout(() => { statusText.style.display = 'none'; }, 3500);
       }
     });
     scene.add(controller);
+
+    const SCALE_MIN = 0.35;
+    const SCALE_MAX = 3.2;
+    const uiBlockSelector = '.glass-btn, .xform-btn, #speed-container, #top-bar, #transform-dock';
+    let userScale = 1;
+    let userRotY = 0;
+
+    function isUiTarget(target) {
+      return !!(target && target.closest && target.closest(uiBlockSelector));
+    }
+
+    function resetUserTransform() {
+      userScale = 1;
+      userRotY = 0;
+      solarSystem.scale.setScalar(1);
+      solarSystem.rotation.set(0, 0, 0);
+    }
+
+    function applyZoom(delta) {
+      if (!isPlaced) return;
+      userScale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, userScale + delta));
+      solarSystem.scale.setScalar(userScale);
+    }
+
+    function applyRotateY(deltaRadians) {
+      if (!isPlaced) return;
+      userRotY += deltaRadians;
+      solarSystem.rotation.y = userRotY;
+      solarSystem.rotation.x = 0;
+      solarSystem.rotation.z = 0;
+    }
+
+    function hideHint() {
+      if (gestureHint) gestureHint.classList.add('hint-faded');
+    }
+
+    function refreshHint() {
+      if (!gestureHint) return;
+      const finePointer = window.matchMedia('(pointer: fine)').matches;
+      gestureHint.textContent = finePointer
+        ? 'Drag to spin · Scroll to zoom'
+        : 'Swipe to spin · Pinch to zoom';
+      gestureHint.classList.remove('hint-faded');
+    }
+
+    function bindHoldButton(button, onTick) {
+      if (!button) return;
+      let timer = null;
+
+      const start = (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        onTick();
+        timer = window.setInterval(onTick, 45);
+      };
+
+      const stop = () => {
+        if (timer) window.clearInterval(timer);
+        timer = null;
+      };
+
+      button.addEventListener('pointerdown', start);
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach((type) => {
+        button.addEventListener(type, stop);
+      });
+    }
+
+    bindHoldButton(document.getElementById('btn-zoom-in'), () => applyZoom(0.04));
+    bindHoldButton(document.getElementById('btn-zoom-out'), () => applyZoom(-0.04));
+    bindHoldButton(document.getElementById('btn-rotate-left'), () => applyRotateY(-0.06));
+    bindHoldButton(document.getElementById('btn-rotate-right'), () => applyRotateY(0.06));
+
+    let isPointerDown = false;
+    let lastPointerX = 0;
+
+    gestureLayer.addEventListener('pointerdown', (event) => {
+      if (!isPlaced || isUiTarget(event.target)) return;
+      if (event.pointerType === 'touch') return;
+      if (event.button !== 0) return;
+      isPointerDown = true;
+      lastPointerX = event.clientX;
+      gestureLayer.classList.add('is-dragging');
+      hideHint();
+    });
+
+    window.addEventListener('pointermove', (event) => {
+      if (!isPointerDown) return;
+      const deltaX = event.clientX - lastPointerX;
+      lastPointerX = event.clientX;
+      applyRotateY(deltaX * 0.01);
+    });
+
+    window.addEventListener('pointerup', () => {
+      isPointerDown = false;
+      gestureLayer.classList.remove('is-dragging');
+    });
+    window.addEventListener('pointercancel', () => {
+      isPointerDown = false;
+      gestureLayer.classList.remove('is-dragging');
+    });
+
+    gestureLayer.addEventListener('wheel', (event) => {
+      if (!isPlaced || isUiTarget(event.target)) return;
+      event.preventDefault();
+      applyZoom(-event.deltaY * 0.0012);
+      hideHint();
+    }, { passive: false });
+
+    let initialDistance = 0;
+    let previousTouchX = 0;
+
+    document.addEventListener('touchstart', (event) => {
+      if (!isPlaced || isUiTarget(event.target)) return;
+      if (event.touches.length === 2) {
+        initialDistance = Math.hypot(
+          event.touches[0].pageX - event.touches[1].pageX,
+          event.touches[0].pageY - event.touches[1].pageY
+        );
+      } else if (event.touches.length === 1) {
+        previousTouchX = event.touches[0].pageX;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (event) => {
+      if (!isPlaced || isUiTarget(event.target)) return;
+
+      if (event.touches.length === 2) {
+        const newDistance = Math.hypot(
+          event.touches[0].pageX - event.touches[1].pageX,
+          event.touches[0].pageY - event.touches[1].pageY
+        );
+        applyZoom((newDistance - initialDistance) * 0.003);
+        initialDistance = newDistance;
+        hideHint();
+        return;
+      }
+
+      if (event.touches.length === 1) {
+        const deltaX = event.touches[0].pageX - previousTouchX;
+        previousTouchX = event.touches[0].pageX;
+        applyRotateY(deltaX * 0.012);
+        hideHint();
+      }
+    }, { passive: true });
 
     renderer.setAnimationLoop((timestamp, frame) => {
       if (frame && !isPlaced) {
